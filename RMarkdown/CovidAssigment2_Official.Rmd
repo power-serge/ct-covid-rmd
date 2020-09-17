@@ -3,6 +3,8 @@ title: "CT Covid 19 Data"
 author: "Brian Gonzalez and Sergio Yraita, Jr"
 date: "`r format.Date(Sys.time(), '%m/%d/%Y @ %H:%M:%S')`"
 output: html_document
+params:
+  data: "New London"
 ---
 ```{r, echo=FALSE, message=FALSE}
 # include libraries
@@ -22,9 +24,16 @@ beginDate <- format.Date(first(covid$dateupdated), '%m/%d/%Y')
 lastDate <- format.Date(last(covid$dateupdated), '%m/%d/%Y')
 ```
 
-
 *This page contains COVID-19 information for CT, for the total number of cases from `r beginDate ` to `r lastDate`.*
 
+This page includes:
+
+* A line graph progression of all cases per county within the given time frame.
+* A Bar graph of all cases per county for the most recent date.
+* A table showing data for all cases per county for the most recent date.
+* A graph of filtered data for the specified county showing number of cases over time.
+
+Data was obtained from [CT.gov](https://data.ct.gov/resource/bfnu-rgqt.csv) website.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -36,7 +45,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # Generates a graph of total cases over time for each county 
 # plot cases over time
 ggplot(covid, aes(dateupdated, totalcases, color = county)) +
-  geom_line() + theme_classic() + xlab('')
+  geom_line() + theme_classic() + xlab('') + ylab('Total Cases')
 ```
 
 ## Most Recent Total Cases per County - Bar Graph
@@ -54,8 +63,9 @@ colnames(covid_mr) <- c("Date Updated", "County Code", "County",
 
 ggplot(data = covid_mr, aes(x= County, y = `Total Cases`, fill = County)) +
   geom_bar(stat = "identity") + ggtitle("Total Cases per County") +
-  theme(legend.position = "none") + labs(x = "County", y = "Total Cases")
+  theme(legend.position = "none") + labs(x = "", y = "Total Cases")
 ```
+
 
 ## Most Recent Total Cases per County - Table
 
@@ -65,8 +75,13 @@ covid_mr$`Date Updated` <- format.Date(covid_mr$`Date Updated`, '%m/%d/%Y')
 kable(covid_mr[1:8, ], caption = "Recent Cases")
 ```
 
+## Total cases over time for `r params$data`
+
 ```{r, echo=FALSE, message=FALSE}
-
-
-
+# Filters the data for a specified county, which is specified as a parameter 
+# in the R Markdown file, and graphs the number of cases for this county ovr time.
+covid_county <- covid %>% filter(county == params$data) 
+ggplot(covid_county, aes(dateupdated, totalcases) ) +
+  geom_line(color="red", size=1.5 ) +  xlab(' ') + ylab('Total Cases') + 
+  theme_classic()
 ```
