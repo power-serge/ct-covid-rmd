@@ -1,0 +1,65 @@
+---
+title: "CT Covid 19 Data - `r params$data`"
+author: "Brian Gonzalez and Sergio Yraita, Jr"
+date: "`r format.Date(Sys.time(), '%m/%d/%Y @ %H:%M:%S')`"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+params:
+  data: "New London"
+---
+
+```{r setup, include=FALSE}
+# include libraries
+library(flexdashboard)
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(knitr)
+
+# get the data
+covid <- read_csv("https://data.ct.gov/resource/bfnu-rgqt.csv")
+
+# make sure data is in the right order
+covid <- covid %>% arrange(dateupdated)
+
+# Filters the data for a specified county, which is specified as a parameter 
+# in the R Markdown file, and graphs the number of cases for this county ovr time.
+covid_county <- covid %>% filter(county == params$data) 
+
+# get date range
+beginDate <- format.Date(first(covid$dateupdated), '%m/%d/%Y')
+lastDate <- format.Date(last(covid$dateupdated), '%m/%d/%Y')
+```
+
+*This page contains COVID-19 information for CT, for the total number of cases from `r beginDate ` to `r lastDate`.*
+
+Row
+-----------------------------------------------------------------------
+
+### Total Number of cases
+
+```{r}
+cases <- last(covid_county$totalcases)
+valueBox(cases, icon = "fa-folder-open")
+```
+
+### Total Number of deaths
+
+```{r}
+deaths <- last(covid_county$totaldeaths)
+valueBox(deaths, icon = "fa-skull")
+```
+
+### Current Hospitalizations
+
+```{r}
+hospitalizations <- last(covid_county$hospitalization)
+if (hospitalizations > 20) {
+  valueBox(hospitalizations, icon = "fa-first-aid", color = "danger")
+} else if (hospitalizations > 10) {
+  valueBox(hospitalizations, icon = "fa-first-aid", color = "warning")
+} else {
+  valueBox(hospitalizations, icon = "fa-first-aid", color = "primary")
+}
+```
