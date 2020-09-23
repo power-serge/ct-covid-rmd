@@ -32,6 +32,10 @@ beginDate <- format.Date(first(covid$dateupdated), '%m/%d/%Y')
 lastDate <- format.Date(last(covid$dateupdated), '%m/%d/%Y')
 ```
 
+<div align="center">
+*This page contains COVID-19 information for `r params$data`, CT from `r beginDate ` to `r lastDate`.*
+</div>
+
 Row
 -----------------------------------------------------------------------
 
@@ -62,8 +66,9 @@ if (hospitalizations > 20) {
 }
 ```
 
-Row {data-height=1000}
+Row 
 -----------------------------------------------------------------------
+
 ### Cases per Day
 
 ```{r, echo=FALSE, message=FALSE}
@@ -105,8 +110,3 @@ geom_bar(stat="identity", fill="orange") + theme(legend.position = "none") + lab
 
 bar_hospitilization
 ```
-
-Row
------------------------------------------------------------------------
-
-*This page contains COVID-19 information for `r params$data`, CT from `r beginDate ` to `r lastDate`.*
