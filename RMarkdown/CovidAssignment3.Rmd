@@ -32,6 +32,10 @@ beginDate <- format.Date(first(covid$dateupdated), '%m/%d/%Y')
 lastDate <- format.Date(last(covid$dateupdated), '%m/%d/%Y')
 ```
 
+<div align="center">
+*This page contains COVID-19 information for `r params$data`, CT from `r beginDate ` to `r lastDate`.*
+</div>
+
 Row
 -----------------------------------------------------------------------
 
@@ -51,7 +55,7 @@ valueBox(deaths, icon = "fa-skull")
 
 ### Current Hospitalizations
 
-```{r}
+```{r, echo=FALSE, message=FALSE}
 hospitalizations <- last(covid_county$hospitalization)
 if (hospitalizations > 20) {
   valueBox(hospitalizations, icon = "fa-first-aid", color = "danger")
@@ -62,47 +66,47 @@ if (hospitalizations > 20) {
 }
 ```
 
-Row
+Row 
 -----------------------------------------------------------------------
-*This page contains COVID-19 information for `r params$data`, CT from `r beginDate ` to `r lastDate`.*
 
-```{r}
+### Cases per Day
+
+```{r, echo=FALSE, message=FALSE}
 # Daily Cases along with its bar graph
-cases1 <- covid_county$confirmedcases
+cases1 <- covid_county$totalcases
 daily_cases <- diff(cases1)
 dc <- daily_cases < 0
-which(dc, TRUE)
 daily_cases <- cbind(TotalCases = c(0,daily_cases))
-daily_cases
 df <- data.frame(daily_cases,covid_county$dateupdated)
-barcases <- ggplot(data = df, aes(x=covid_county.dateupdated ,y = TotalCases, fill = covid_county.dateupdated )) +
-geom_bar(stat = "identity") + ggtitle("Total Daily Cases") +
-theme(legend.position = "none") + labs(x = "Date (month)", y = "Cases")
+
+barcases <- ggplot(data = df, aes(x=covid_county.dateupdated ,y = TotalCases, )) +
+geom_bar(stat = "identity", fill="steelblue") + theme(legend.position = "none") + labs(x = " ", y = "Cases")
+
 barcases
+```
 
 
+### Deaths per Day
+
+```{r, echo=FALSE, message=FALSE}
 # Daily deaths along with its bar graph
 deaths1 <- covid_county$totaldeaths
 daily_deaths <- diff(deaths1)
-daily_deaths
 daily_deaths <- cbind(TotalDeaths = c(0,daily_deaths))
-daily_cases
 death_df <- data.frame(daily_deaths,covid_county$dateupdated)
-death_df
-bar_deaths <- ggplot(data = death_df, aes(x=covid_county.dateupdated ,y = TotalDeaths, fill = covid_county.dateupdated )) +
-geom_bar(stat = "identity") + ggtitle("Total Daily Deaths") +
-theme(legend.position = "none") + labs(x = "Date (month)", y = "Deaths")
+
+bar_deaths <- ggplot(data = death_df, aes(x=covid_county.dateupdated ,y = TotalDeaths)) +
+geom_bar(stat="identity", fill="black") + theme(legend.position = "none") + labs(x = " ", y = "Deaths")
+
 bar_deaths
-
-# Daily hospitilizations and its graph
-colnames(covid_county)
-bar_hospitilizations <- ggplot(data = covid_county, aes(x = dateupdated ,y = hospitalizations, fill = dateupdated )) +
-geom_bar(stat = "identity") + ggtitle("Total Daily Hospitilizations") +
-theme(legend.position = "none") + labs(x = "Date (month)", y = "Hospitilizations")
-bar_hospitilizations
-covid_county$hospitalization
-
-covid_county$confirmedcases < 0
-
 ```
 
+### Hospitalizations per Day
+
+```{r, echo=FALSE, message=FALSE}
+# Daily hospitilizations and its graph
+bar_hospitilization <- ggplot(data = covid_county, aes(x = dateupdated , y = hospitalization)) +
+geom_bar(stat="identity", fill="orange") + theme(legend.position = "none") + labs(x = " ", y = "Hospitalizations")
+
+bar_hospitilization
+```
