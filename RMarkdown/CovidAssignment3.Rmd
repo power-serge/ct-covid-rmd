@@ -10,13 +10,14 @@ params:
 ---
 
 ```{r setup, include=FALSE}
+
 # include libraries
 library(flexdashboard)
 library(readr)
 library(dplyr)
 library(ggplot2)
 library(knitr)
-
+library(zoo) # moving averages   
 # get the data
 covid <- read_csv("https://data.ct.gov/resource/bfnu-rgqt.csv")
 
@@ -75,12 +76,14 @@ Row
 # Daily Cases along with its bar graph
 cases1 <- covid_county$totalcases
 daily_cases <- diff(cases1)
-dc <- daily_cases < 0
+daily_cases <- replace(daily_cases, daily_cases < 0, 0)
+#dc <- daily_cases < 0
 daily_cases <- cbind(TotalCases = c(0,daily_cases))
+seven_case_avg <- rollmean(daily_cases, k = 7, fill = 0)
 df <- data.frame(daily_cases,covid_county$dateupdated)
 
 barcases <- ggplot(data = df, aes(x=covid_county.dateupdated ,y = TotalCases, )) +
-geom_bar(stat = "identity", fill="steelblue") + theme(legend.position = "none") + labs(x = " ", y = "Cases")
+geom_bar(stat = "identity", fill="steelblue") + theme(legend.position = "none") + labs(x = " ", y = "Cases") + geom_line(aes(y = seven_case_avg), size = 1, color="red", group = 1)
 
 barcases
 ```
@@ -92,11 +95,13 @@ barcases
 # Daily deaths along with its bar graph
 deaths1 <- covid_county$totaldeaths
 daily_deaths <- diff(deaths1)
+daily_deaths <- replace(daily_deaths, daily_deaths < 0, 0)
 daily_deaths <- cbind(TotalDeaths = c(0,daily_deaths))
+seven_death_avg <- rollmean(daily_deaths, k = 7, fill = 0)
 death_df <- data.frame(daily_deaths,covid_county$dateupdated)
 
 bar_deaths <- ggplot(data = death_df, aes(x=covid_county.dateupdated ,y = TotalDeaths)) +
-geom_bar(stat="identity", fill="black") + theme(legend.position = "none") + labs(x = " ", y = "Deaths")
+geom_bar(stat="identity", fill="black") + theme(legend.position = "none") + labs(x = " ", y = "Deaths") + geom_line(aes(y = seven_death_avg), size = 1, color="red", group = 1)
 
 bar_deaths
 ```
@@ -105,8 +110,12 @@ bar_deaths
 
 ```{r, echo=FALSE, message=FALSE}
 # Daily hospitilizations and its graph
+seven_hosp_avg <- rollmean(covid_county$hospitalization,k=7,fill=NA)
 bar_hospitilization <- ggplot(data = covid_county, aes(x = dateupdated , y = hospitalization)) +
-geom_bar(stat="identity", fill="orange") + theme(legend.position = "none") + labs(x = " ", y = "Hospitalizations")
+geom_bar(stat="identity", fill="orange") + theme(legend.position = "none") + labs(x = " ", y = "Hospitalizations") + geom_line(aes(y = seven_hosp_avg), size = 1, color="red", group = 1)
 
 bar_hospitilization
+
+
+
 ```
