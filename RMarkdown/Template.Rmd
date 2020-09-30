@@ -1,0 +1,184 @@
+---
+title: "`r params$data` - CT COVID 19 Data"
+#author: "B. Gonzalez and S. Yraita, Jr"
+#date: "`r format.Date(Sys.time(), '%m/%d/%Y @ %H:%M:%S')`"
+output:
+  flexdashboard::flex_dashboard:
+    navbar:
+      - { title: "New London", href: "./New London.html", align: right }
+      - { title: "New Haven",  href: "./New Haven.html",  align: right }
+      - { title: "Fairfield",  href: "./Fairfield.html",  align: right }
+      - { title: "Hartford",   href: "./Hartford.html",   align: right }
+      - { title: "Tolland",    href: "./Tolland.html",    align: right }
+      - { title: "Litchfield", href: "./Litchfield.html", align: right }
+      - { title: "Middlesex",  href: "./Middlesex.html",  align: right }
+      - { title: "Windham",    href: "./Windham.html",    align: right }
+    orientation: rows
+params:
+    data: "New London"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+
+# include libraries
+library(flexdashboard)
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(knitr)
+library(zoo) # moving averages
+
+# get the data - leave for quick testing one file
+#load("../data/covid.RData")
+#covid <- covid %>% arrange(dateupdated)
+
+# Filters the data for a specified county, which is specified as a parameter
+# in the R Markdown file, and graphs the number of cases for this county ovr time.
+covid_county <- covid %>% filter(county == params$data)
+
+# get date range
+beginDate <- format.Date(first(covid$dateupdated), '%m/%d/%Y')
+lastDate <- format.Date(last(covid$dateupdated), '%m/%d/%Y')
+
+cases <- last(covid_county$totalcases)
+deaths <- last(covid_county$totaldeaths)
+
+# Daily Cases along with its bar graph
+cases1 <- covid_county$totalcases
+daily_cases <- diff(cases1)
+daily_cases <- replace(daily_cases, daily_cases < 0, 0)
+daily_cases <- cbind(TotalCases = c(0,daily_cases))
+
+# Daily deaths along with its bar graph
+deaths1 <- covid_county$totaldeaths
+daily_deaths <- diff(deaths1)
+daily_deaths <- replace(daily_deaths, daily_deaths < 0, 0)
+daily_deaths <- cbind(TotalDeaths = c(0,daily_deaths))
+
+hospitalizations <- last(covid_county$hospitalization)
+
+
+```
+
+<div align="left">
+**Created by B. Gonzalez and S. Yraita in support of EIDA's [CT COVID Data Analysis](https://eida.easternct.edu/shiny/app/covid-ct) project.**
+</div>
+
+
+<div align="center">
+*This page contains COVID-19 information for `r params$data`, CT from `r beginDate ` to `r lastDate`.*
+</div>
+
+Row
+-----------------------------------------------------------------------
+
+### Total Number of cases
+
+```{r}
+valueBox(cases, icon = "fa-folder-open")
+```
+
+### Total Number of deaths
+
+```{r}
+valueBox(deaths, icon = "fa-skull")
+```
+
+### Current Hospitalizations
+
+```{r, echo=FALSE, message=FALSE}
+if (hospitalizations > 20) {
+  boxcolor <- "danger"
+} else if (hospitalizations > 10) {
+  boxcolor <- "warning"
+} else {
+  boxcolor <- "primary"
+}
+
+valueBox(hospitalizations, icon = "fa-first-aid", color = boxcolor)
+```
+
+Row
+-----------------------------------------------------------------------
+
+### Cases per Day
+
+```{r, echo=FALSE, message=FALSE}
+# 7 day average for cases
+seven_case_avg <- rollmean(daily_cases, k = 7, fill = 0)
+df <- data.frame(daily_cases,covid_county$dateupdated)
+
+barcases <- ggplot(data = df, aes(x=covid_county.dateupdated ,y = TotalCases, )) +
+geom_bar(stat = "identity", fill="steelblue") + theme(legend.position = "none") + labs(x = " ", y = "Cases") + geom_line(aes(y = seven_case_avg), size = 1, color="red", group = 1)
+
+barcases
+```
+
+### Deaths per Day
+
+```{r, echo=FALSE, message=FALSE}
+# 7 day average for deaths
+seven_death_avg <- rollmean(daily_deaths, k = 7, fill = 0)
+death_df <- data.frame(daily_deaths,covid_county$dateupdated)
+
+bar_deaths <- ggplot(data = death_df, aes(x=covid_county.dateupdated ,y = TotalDeaths)) +
+geom_bar(stat="identity", fill="black") + theme(legend.position = "none") + labs(x = " ", y = "Deaths") + geom_line(aes(y = seven_death_avg), size = 1, color="red", group = 1)
+
+bar_deaths
+```
+
+### Hospitalizations per Day
+
+```{r, echo=FALSE, message=FALSE}
+# Daily hospitalizations and its graph
+# 7 day average for hospitalizations
+seven_hosp_avg <- rollmean(covid_county$hospitalization,k=7,fill=NA)
+
+bar_hospitilization <- ggplot(data = covid_county, aes(x = dateupdated , y = hospitalization)) +
+geom_bar(stat="identity", fill="orange") + theme(legend.position = "none") + labs(x = " ", y = "Hospitalizations") + geom_line(aes(y = seven_hosp_avg), size = 1, color="red", group = 1)
+
+bar_hospitilization
+```
+
+Row
+-----------------------------------------------------------------------
+
+### Previous Daily Cases 
+```{r, echo=FALSE, message=FALSE}
+previous_daily_case <- daily_cases[length(daily_cases)-1]
+gauge(previous_daily_case, min = 0, max = 100, symbol = '', gaugeSectors(
+success = c(0, 10), warning = c(10,20), danger = c(20,200)
+))
+```
+
+### Latest Daily Cases 
+
+```{r, echo=FALSE, message=FALSE}
+previous_daily_case <- daily_cases[length(daily_cases)]
+gauge(previous_daily_case, min = 0, max = 100, symbol = '', gaugeSectors(
+success = c(0, 10), warning = c(10,20), danger = c(20,200)
+))
+```
+
+Row
+-----------------------------------------------------------------------
+
+### Previous Daily Deaths 
+
+```{r, echo=FALSE, message=FALSE}
+previous_daily_deaths <- daily_deaths[length(daily_deaths)-1]
+gauge(previous_daily_deaths, min = 0, max = 50, symbol = '', gaugeSectors(
+success = c(0, 5), warning = c(5,10), danger = c(10,200)
+))
+```
+
+### Latest Daily Deaths 
+
+```{r, echo=FALSE, message=FALSE}
+previous_daily_deaths <- daily_deaths[length(daily_deaths)]
+gauge(previous_daily_deaths, min = 0, max = 50, symbol = '', gaugeSectors(
+success = c(0, 5), warning = c(5,10), danger = c(10,200)
+))
+```
