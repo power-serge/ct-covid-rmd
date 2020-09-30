@@ -32,7 +32,7 @@ for (i in counties) {
   #print(htmlfile)
   
   # render the document
-  rmarkdown::render(template, output_file = htmlfile, params = list(data = i), quiet = TRUE)
+  rmarkdown::render(template, output_file = htmlfile, params = list(data = i))
 }
 
 

@@ -16,7 +16,8 @@ output:
     orientation: rows
 params:
     data: "New London"
-chunk_output_type: console
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -30,7 +31,8 @@ library(knitr)
 library(zoo) # moving averages
 
 # get the data - leave for quick testing one file
-#covid <- read_csv("https://data.ct.gov/resource/bfnu-rgqt.csv")
+#load("../data/covid.RData")
+#covid <- covid %>% arrange(dateupdated)
 
 # Filters the data for a specified county, which is specified as a parameter
 # in the R Markdown file, and graphs the number of cases for this county ovr time.
