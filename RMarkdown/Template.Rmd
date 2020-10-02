@@ -16,9 +16,39 @@ output:
     orientation: rows
 params:
     data: "New London"
+    devp: "n"
 editor_options: 
   chunk_output_type: console
 ---
+<!-- highlight the tab of the county currently displaying -->
+<style>
+.current {
+    
+    background-color: #1967be;
+}
+</style>
+
+<script>
+
+// wait for the page to load to do this, can't select elements that aren't loaded yet.
+
+window.onload = function () {
+
+  // console.log("We are executing on load");
+  
+  var list = document.querySelectorAll(".navbar-right > li > a");
+  
+  for (i=0; i<list.length; i++)
+  {
+    var x = list[i];
+    if (x.innerHTML == "`r params$data`")
+    {
+      x.classList.add("current"); // assign the current class to the current tab
+    }
+  }
+}
+
+</script>
 
 ```{r setup, include=FALSE}
 
@@ -58,17 +88,18 @@ daily_deaths <- replace(daily_deaths, daily_deaths < 0, 0)
 daily_deaths <- cbind(TotalDeaths = c(0,daily_deaths))
 
 hospitalizations <- last(covid_county$hospitalization)
-
-
 ```
 
 <div align="left">
 **Created by B. Gonzalez and S. Yraita in support of EIDA's [CT COVID Data Analysis](https://eida.easternct.edu/shiny/app/covid-ct) project.**
 </div>
 
+<div align="center">
+#### `r if(params$devp == 'y'){"*This site is under development and is deployed using GitHub pages for testing purposes.*"}`
+</div>
 
 <div align="center">
-*This page contains COVID-19 information for `r params$data`, CT from `r beginDate ` to `r lastDate`.*
+### *This page contains COVID-19 information for `r params$data`, CT from `r beginDate ` to `r lastDate`.*
 </div>
 
 Row
@@ -145,40 +176,40 @@ bar_hospitilization
 Row
 -----------------------------------------------------------------------
 
-### Previous Daily Cases 
+### Previous Daily Cases (Full Gauge Indicates 100 cases or more)
 ```{r, echo=FALSE, message=FALSE}
 previous_daily_case <- daily_cases[length(daily_cases)-1]
 gauge(previous_daily_case, min = 0, max = 100, symbol = '', gaugeSectors(
-success = c(0, 10), warning = c(10,20), danger = c(20,200)
+success = c(0, 10), warning = c(10,20), danger = c(20,200), colors = c("primary", "warning", "danger")
 ))
 ```
 
-### Latest Daily Cases 
+### Latest Daily Cases (Full Gauge Indicates 100 cases or more)
 
 ```{r, echo=FALSE, message=FALSE}
 previous_daily_case <- daily_cases[length(daily_cases)]
 gauge(previous_daily_case, min = 0, max = 100, symbol = '', gaugeSectors(
-success = c(0, 10), warning = c(10,20), danger = c(20,200)
+success = c(0, 10), warning = c(10,20), danger = c(20,200), colors = c("primary", "warning", "danger")
 ))
 ```
 
 Row
 -----------------------------------------------------------------------
 
-### Previous Daily Deaths 
+### Previous Daily Deaths (Full Gauge Indicates 50 deaths or more)
 
 ```{r, echo=FALSE, message=FALSE}
 previous_daily_deaths <- daily_deaths[length(daily_deaths)-1]
 gauge(previous_daily_deaths, min = 0, max = 50, symbol = '', gaugeSectors(
-success = c(0, 5), warning = c(5,10), danger = c(10,200)
+success = c(0, 5), warning = c(5,10), danger = c(10,200), colors = c("primary", "warning", "danger")
 ))
 ```
 
-### Latest Daily Deaths 
+### Latest Daily Deaths (Full Gauge Indicates 50 deaths or more)
 
 ```{r, echo=FALSE, message=FALSE}
 previous_daily_deaths <- daily_deaths[length(daily_deaths)]
 gauge(previous_daily_deaths, min = 0, max = 50, symbol = '', gaugeSectors(
-success = c(0, 5), warning = c(5,10), danger = c(10,200)
+success = c(0, 5), warning = c(5,10), danger = c(10,200), colors = c("primary", "warning", "danger")
 ))
 ```
