@@ -1,0 +1,203 @@
+* {
+	box-sizing: border-box;
+}
+
+/* General Hyperlink Styles */
+/* Adding Icons */
+a[href*="http"],
+a.learn {
+	background: url('https://mdn.mozillademos.org/files/12982/external-link-52.png') no-repeat 100% 0;
+	background-size: 15px;
+	padding-right: 20px;
+}
+
+/* unvisited link */
+a:link {
+	text-decoration: none;
+	color: #1abc9c;
+}
+
+/* visited link */
+a:visited {
+	color: grey;
+}
+
+/* mouse over link */
+a:hover {
+	background-color: #ddd;
+	text-decoration: underline;
+}
+
+
+/* Style the body */
+body {
+	font-family: Arial, Helvetica, sans-serif;
+	margin: 0;
+}
+
+h1 {
+	margin-block-start: 0.2em;
+	margin-block-end: 0.2em;
+}
+
+
+/* Header/logo Title */
+.header {
+	padding: 10px;
+	text-align: center;
+	background: #1abc9c;
+	color: white;
+}
+
+/* Increase the font size of the heading */
+.header h1 {
+	font-size: 85px;
+}
+
+.header p {
+	font-size: 25px;
+}
+
+
+/* Sticky navbar - toggles between relative and fixed, depending on the scroll position. 
+	It is positioned relative until a given offset position is met in the viewport - then
+	it "sticks" in place (like position:fixed). The sticky value is not supported in IE or Edge 15
+	and earlier versions. However, for these versions the navbar will inherit default position */
+.navbar {
+	overflow: hidden;
+	background-color: #333;
+	position: sticky;
+	position: -webkit-sticky;
+	top: 0;
+}
+
+
+/* Style the navigation bar links */
+.navbar a {
+	float: left;
+	display: block;
+	color: white;
+	text-align: center;
+	padding: 14px 20px;
+	text-decoration: none;
+}
+
+/* Change color on hover */
+.navbar a:hover {
+	background-color: #ddd;
+	color: black;
+}
+
+/* Active/current link */
+.navbar a.active {
+	background-color: #666;
+	color: white;
+}
+
+.navbar a.right {
+  float: right;
+}
+
+
+/* Column container */
+.row {
+	display: -ms-flexbox;
+	/* IE10 */
+	display: flex;
+	-ms-flex-wrap: wrap;
+	/* IE10 */
+	flex-wrap: wrap;
+}
+
+/* Create two unequal columns that sits next to each other */
+/* Sidebar/left column */
+.side {
+	-ms-flex: 30%;
+	/* IE10 */
+	flex: 30%;
+	background-color: #f1f1f1;
+	padding: 20px;
+}
+
+/* Main column */
+.main {
+	-ms-flex: 70%;
+	/* IE10 */
+	flex: 70%;
+	background-color: white;
+	padding: 20px;
+}
+
+
+/* consensus diagram */
+#large_pic {
+	background-color: #aaa;
+	height: auto;
+	padding: 2px;
+	display: block;	
+	margin-left: auto;
+	margin-right: auto;
+	width: 88%;
+}
+
+
+/* img styles */
+.home_img {
+	background-color: #aaa;
+	width: 100%;
+	max-height: 30%;
+	padding: 2px;
+}
+
+
+/* arrow up image for go to top */
+.icon-arrow-up {
+	display: inline-block;
+	background: url('https://developer.mozilla.org/static/arrows/arrow-up.7bcf357a852e.svg') no-repeat 100% 0;
+	background-size: 18px;
+	width: 18px;
+	height: 18px;
+}
+
+
+/* Footer */
+.footer {
+	padding: 20px;
+	text-align: center;
+	background: #ddd;
+}
+
+
+/* Responsive layout - when the screen is less than 700px wide, make the two columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 700px) {
+	.row {
+		flex-direction: column;
+	}
+	.header h1 {
+		font-size: 65px;
+	}
+	.header p {
+		font-size: 25px;
+	}
+	#large_pic {
+		width: 100%;
+	}
+}
+
+
+/* Responsive layout - when the screen is less than 400px wide, make the navigation links stack on top of each other instead of next to each other */
+@media screen and (max-width: 400px) {
+	.navbar a {
+		float: none;
+		width: 100%;
+	}
+	.header h1 {
+		font-size: 45px;
+	}
+	.header p {
+		font-size: 25px;
+	}
+	#large_pic {
+		width: 100%;
+	}
+}
