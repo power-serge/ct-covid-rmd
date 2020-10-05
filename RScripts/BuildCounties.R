@@ -6,7 +6,7 @@ library(dplyr)
 
 # reference to data and html dirs and extension value
 datadir <- "../data"
-htmldir <- "../html"
+htmldir <- "../docs"
 ext     <- ".html"
 
 # create the data directory if it doesn't exist

@@ -1,9 +1,10 @@
 ---
-title: "`r params$data` - CT COVID 19 Data"
+title: "`r params$data` - [CT COVID 19 Data](./index.html)"
 #author: "B. Gonzalez and S. Yraita, Jr"
 #date: "`r format.Date(Sys.time(), '%m/%d/%Y @ %H:%M:%S')`"
 output:
   flexdashboard::flex_dashboard:
+    favicon: https://hubcdn.arcgis.com/opendata-ui/assets/assets/images/favicon-45a5f6cdc7f23c52b20204d54a7d9ca2.ico
     navbar:
       - { title: "New London", href: "./New London.html", align: right }
       - { title: "New Haven",  href: "./New Haven.html",  align: right }
@@ -61,8 +62,8 @@ library(knitr)
 library(zoo) # moving averages
 
 # get the data - leave for quick testing one file
-#load("../data/covid.RData")
-#covid <- covid %>% arrange(dateupdated)
+load("../data/covid.RData")
+covid <- covid %>% arrange(dateupdated)
 
 # Filters the data for a specified county, which is specified as a parameter
 # in the R Markdown file, and graphs the number of cases for this county ovr time.
@@ -114,7 +115,8 @@ valueBox(cases, icon = "fa-folder-open")
 ### Total Number of deaths
 
 ```{r}
-valueBox(deaths, icon = "fa-skull")
+#valueBox(deaths, icon = "fa-skull")
+valueBox(deaths, icon = "ion-ios-medical")
 ```
 
 ### Current Hospitalizations
