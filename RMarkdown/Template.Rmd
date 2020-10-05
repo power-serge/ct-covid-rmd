@@ -1,9 +1,8 @@
 ---
 title: "`r params$data` - CT COVID 19 Data"
-#author: "B. Gonzalez and S. Yraita, Jr"
-#date: "`r format.Date(Sys.time(), '%m/%d/%Y @ %H:%M:%S')`"
 output:
   flexdashboard::flex_dashboard:
+    favicon: https://hubcdn.arcgis.com/opendata-ui/assets/assets/images/favicon-45a5f6cdc7f23c52b20204d54a7d9ca2.ico
     navbar:
       - { title: "New London", href: "./New London.html", align: right }
       - { title: "New Haven",  href: "./New Haven.html",  align: right }
@@ -19,6 +18,35 @@ params:
 editor_options: 
   chunk_output_type: console
 ---
+<!-- highlight the tab of the county currently displaying -->
+<style>
+.current {
+    
+    background-color: #1967be;
+}
+</style>
+
+<script>
+
+// wait for the page to load to do this, otherwise you are selecting air
+
+window.onload = function () {
+
+  console.log("We are executing on load");
+  
+  var list = document.querySelectorAll(".navbar-right > li > a");
+  
+  for (i=0; i<list.length; i++)
+  {
+    var x = list[i];
+    if (x.innerHTML == "`r params$data`")
+    {
+      x.classList.add("current"); // assign the current class to the current tab
+    }
+  }
+}
+
+</script>
 
 ```{r setup, include=FALSE}
 
@@ -31,8 +59,8 @@ library(knitr)
 library(zoo) # moving averages
 
 # get the data - leave for quick testing one file
-#load("../data/covid.RData")
-#covid <- covid %>% arrange(dateupdated)
+load("../data/covid.RData")
+covid <- covid %>% arrange(dateupdated)
 
 # Filters the data for a specified county, which is specified as a parameter
 # in the R Markdown file, and graphs the number of cases for this county ovr time.
@@ -59,7 +87,6 @@ daily_deaths <- cbind(TotalDeaths = c(0,daily_deaths))
 
 hospitalizations <- last(covid_county$hospitalization)
 
-
 ```
 
 <div align="left">
@@ -68,7 +95,7 @@ hospitalizations <- last(covid_county$hospitalization)
 
 
 <div align="center">
-*This page contains COVID-19 information for `r params$data`, CT from `r beginDate ` to `r lastDate`.*
+#### *This page contains COVID-19 information for `r params$data`, CT from `r beginDate ` to `r lastDate`.*
 </div>
 
 Row
@@ -182,3 +209,4 @@ gauge(previous_daily_deaths, min = 0, max = 50, symbol = '', gaugeSectors(
 success = c(0, 5), warning = c(5,10), danger = c(10,200)
 ))
 ```
+

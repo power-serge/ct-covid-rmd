@@ -6,7 +6,7 @@ library(dplyr)
 
 # reference to data and html dirs and extension value
 datadir <- "../data"
-htmldir <- "../html/"
+htmldir <- "../html"
 ext     <- ".html"
 
 # create the data directory if it doesn't exist
@@ -37,9 +37,9 @@ counties <- unique(covid$county)
 for (i in counties) {
   
   # build the file name and path
-  htmlfile <- paste(htmldir, i, ext, sep="")
+  htmlfile <- paste(htmldir, "/", i, ext, sep="")
   
-  print(htmlfile)
+  #print(htmlfile)
   
   # render the document
   rmarkdown::render(template, output_file = htmlfile, params = list(data = i))
