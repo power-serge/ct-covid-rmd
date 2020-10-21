@@ -4,17 +4,19 @@ output:
   flexdashboard::flex_dashboard:
     favicon: https://hubcdn.arcgis.com/opendata-ui/assets/assets/images/favicon-45a5f6cdc7f23c52b20204d54a7d9ca2.ico
     navbar:
-      - { title: "New London", href: "./New London.html", align: right }
-      - { title: "New Haven",  href: "./New Haven.html",  align: right }
-      - { title: "Fairfield",  href: "./Fairfield.html",  align: right }
-      - { title: "Hartford",   href: "./Hartford.html",   align: right }
-      - { title: "Tolland",    href: "./Tolland.html",    align: right }
-      - { title: "Litchfield", href: "./Litchfield.html", align: right }
-      - { title: "Middlesex",  href: "./Middlesex.html",  align: right }
-      - { title: "Windham",    href: "./Windham.html",    align: right }
+    - { title: "Home",          href: "", align: left }
+    - { title: "Projections",   href: "", align: left }
+    - { title: "Statewide Data",href: "", align: left }
+    - { title: "County Data",   href: "./county.html", align: left }
+    - { title: "Age Data",      href: "", align: left }
+    - { title: "Gender Data",   href: "", align: left }
+    - { title: "Email Sign-up", href: "", align: left }
+    - { title: "About",         href: "", align: left }
     orientation: rows
+    vertical_layout: scroll
 params:
-    data: "New London"
+    data: "Hartford"
+    devp: "n"
 editor_options: 
   chunk_output_type: console
 ---
@@ -24,29 +26,65 @@ editor_options:
     
     background-color: maroon;
 }
+
+.blue {
+  
+    text-decoration: none;
+    color: #ffffff !important;
+    background-color: #2780e3;
+}
 </style>
 
 <script>
-
-// wait for the page to load to do this, otherwise you are selecting air
+// wait for the page to load to do this, can't select elements that aren't loaded yet.
 
 window.onload = function () {
 
-  console.log("We are executing on load");
+  // console.log("We are executing on load");
   
-  var list = document.querySelectorAll(".navbar-right > li > a");
+  var tabs = document.querySelectorAll(".navbar-left > li > a");
   
-  for (i=0; i<list.length; i++)
+  for (i=0; i<tabs.length; i++)
   {
-    var x = list[i];
-    if (x.innerHTML == "`r params$data`")
+    var x = tabs[i];
+    //console.log(x.innerHTML);
+    if (x.innerHTML == "County Data")
     {
       x.classList.add("current"); // assign the current class to the current tab
     }
   }
+  
+  var ddlist = document.querySelectorAll(".dropdown-menu > li > a");
+  
+  for (i=0; i<ddlist.length; i++)
+  {
+    var x = ddlist[i];
+    //console.log(x.innerHTML);
+    if (x.innerHTML == "`r params$data`")
+    {
+      x.classList.add("blue"); // assign the current class to the current tab
+    }
+  }
 }
-
 </script>
+
+<div align="left">
+<ul class="nav nav-tabs" role="tablist">
+    <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">Please Select a County<span class="caret"></span></a>
+        <ul class="dropdown-menu">
+            <li><a href="./New London.html">New London</a></li>
+            <li><a href="./New Haven.html" >New Haven</a></li>
+            <li><a href="./Fairfield.html" >Fairfield</a></li>
+            <li><a href="./Hartford.html"  >Hartford</a></li>
+            <li><a href="./Tolland.html"   >Tolland</a></li>
+            <li><a href="./Litchfield.html">Litchfield</a></li>
+            <li><a href="./Middlesex.html" >Middlesex</a></li>
+            <li><a href="./Windham.html"   >Windham</a></li>
+        </ul>
+    </li>
+</ul>
+</div>
 
 ```{r setup, include=FALSE}
 
@@ -96,17 +134,16 @@ highest_30day_deaths <- max(daily_deaths[(length(daily_deaths)-30):length(daily_
 
 ```
 
-<div align="left">
-**Created by B. Gonzalez and S. Yraita in support of EIDA's [CT COVID Data Analysis](https://eida.easternct.edu/shiny/app/covid-ct) project.**
+<div align="center">
+#### `r if(params$devp == 'y'){"*This site is under development and is deployed using GitHub pages for testing purposes.*"}`
 </div>
 
-
 <div align="center">
-### *This page contains COVID-19 information for `r params$data`, CT from `r beginDate ` to `r lastDate`.*
+### *This page contains COVID-19 information for **`r params$data`, CT** from `r beginDate ` to `r lastDate`.*
 </div>
 
 Row
------------------------------------------------------------------------
+----------------------------------------------------------------------
 
 ### Total Number of cases
 
@@ -117,7 +154,7 @@ valueBox(cases, icon = "fa-folder-open")
 ### Total Number of deaths
 
 ```{r}
-valueBox(deaths, icon = "fa-skull")
+valueBox(deaths, icon = "ion-ios-medical")
 ```
 
 ### Current Hospitalizations
@@ -187,7 +224,7 @@ success = c(0,highest_30day_cases), colors=c("primary")
 ))
 ```
 
-### Previous Daily Deaths 
+### Previous Daily Deaths (30 day high = `r highest_30day_deaths`) 
 
 ```{r, echo=FALSE, message=FALSE}
 previous_daily_deaths <- daily_deaths[length(daily_deaths)-1]
@@ -195,28 +232,10 @@ gauge(previous_daily_deaths, min = 0, max = highest_30day_deaths, symbol = '', g
 success = c(0,highest_30day_deaths),colors = c("black")
 ))
 ```
- 
 
-
-Row
+Row {data-height=10px}
 -----------------------------------------------------------------------
 
-### Latest Daily Cases
-
-```{r, echo=FALSE, message=FALSE}
-previous_daily_case <- daily_cases[length(daily_cases)]
-gauge(previous_daily_case, min = 0, max = highest_30day_cases, symbol = '', gaugeSectors(
-success = c(0,highest_30day_cases), colors=c("primary")
-))
-```
-
-
-### Latest Daily Deaths 
-
-```{r, echo=FALSE, message=FALSE}
-previous_daily_deaths <- daily_deaths[length(daily_deaths)]
-gauge(previous_daily_deaths, min = 0, max = highest_30day_deaths, symbol = '', gaugeSectors(
-success = c(0, highest_30day_deaths),colors = c("black")
-))
-```
-
+<div align="right">
+**Created by B. Gonzalez and S. Yraita in support of EIDA's [CT COVID Data Analysis](https://eida.easternct.edu/shiny/app/covid-ct) project.**
+</div>
