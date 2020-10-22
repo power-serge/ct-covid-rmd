@@ -20,53 +20,6 @@ params:
 editor_options: 
   chunk_output_type: console
 ---
-<!-- highlight the tab of the county currently displaying -->
-<style>
-.current {
-    
-    background-color: maroon;
-}
-</style>
-
-<script>
-
-// wait for the page to load to do this, can't select elements that aren't loaded yet.
-
-window.onload = function () {
-
-  // console.log("We are executing on load");
-  
-  var list = document.querySelectorAll(".navbar-left > li > a");
-  
-  for (i=0; i<list.length; i++)
-  {
-    var x = list[i];
-    //console.log(x.innerHTML);
-    if (x.innerHTML == "County Data")
-    {
-      x.classList.add("current"); // assign the current class to the current tab
-      x.classList.toggle("show")
-    }
-  }
-}
-</script>
-
-<ul class="nav nav-tabs" role="tablist">
-    <li class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">Please Select a County<span class="caret"></span></a>
-        <ul class="dropdown-menu">
-            <li><a href="./New London.html">New London</a></li>
-            <li><a href="./New Haven.html" >New Haven </a></li>
-            <li><a href="./Fairfield.html" >Fairfield </a></li>
-            <li><a href="./Hartford.html"  >Hartford  </a></li>
-            <li><a href="./Tolland.html"   >Tolland   </a></li>
-            <li><a href="./Litchfield.html">Litchfield</a></li>
-            <li><a href="./Middlesex.html" >Middlesex </a></li>
-            <li><a href="./Windham.html"   >Windham   </a></li>
-        </ul>
-    </li>
-</ul>
-
 ```{r setup, include=FALSE}
 
 # include libraries
@@ -88,34 +41,131 @@ covid_county <- covid %>% filter(county == params$data)
 # get date range
 beginDate <- format.Date(first(covid$dateupdated), '%m/%d/%Y')
 lastDate <- format.Date(last(covid$dateupdated), '%m/%d/%Y')
-
-cases <- last(covid_county$totalcases)
-deaths <- last(covid_county$totaldeaths)
-
-# Daily Cases along with its bar graph
-cases1 <- covid_county$totalcases
-daily_cases <- diff(cases1)
-daily_cases <- replace(daily_cases, daily_cases < 0, 0)
-daily_cases <- cbind(TotalCases = c(0,daily_cases))
-
-# Daily deaths along with its bar graph
-deaths1 <- covid_county$totaldeaths
-daily_deaths <- diff(deaths1)
-daily_deaths <- replace(daily_deaths, daily_deaths < 0, 0)
-daily_deaths <- cbind(TotalDeaths = c(0,daily_deaths))
-
-# Hospitalizations
-hospitalizations <- last(covid_county$hospitalization)
-
-# 30 day highest case 
-highest_30day_cases <- max(daily_cases[(length(daily_cases)-30):length(daily_cases)])
-
-# 30 day highest deaths
-highest_30day_deaths <- max(daily_deaths[(length(daily_deaths)-30):length(daily_deaths)])
-
 ```
 
+<!--CUSTOM STYLES-->
+<style>
+/* highlight the tab of the county currently displaying */
+.current {
+  background-color: maroon;
+}
+
+button.dropdown-toggle {
+  color: #ffffff;
+  background-color: #2780e3;
+  font-size: x-large;
+}
+
+.center {
+  margin: auto;
+  /*width: 30%;*/
+  /*border: 3px solid #73AD21;*/
+  padding: 10px;
+}
+</style>
+
+<!--CUSTOM JS-->
+<script>
+// wait for the page to load to do this, can't select elements that aren't loaded yet.
+
+window.onload = function () {
+
+  // console.log("We are executing on load");
+  
+  var list = document.querySelectorAll(".navbar-left > li > a");
+  
+  for (i=0; i<list.length; i++)
+  {
+    var x = list[i];
+    //console.log(x.innerHTML);
+    if (x.innerHTML == "County Data")
+    {
+      x.classList.add("current"); // assign the current class to the current tab
+    }
+  }
+}
+</script>
+
+<!--CUSTOM HTML-->
 <div align="center">
 #### `r if(params$devp == 'y'){"*This site is under development and is deployed using GitHub pages for testing purposes.*"}`
 </div>
 
+<div align="center">
+### *This page contains COVID-19 information for the 8 Counties in CT from `r beginDate ` to `r lastDate`.*
+</div>
+
+<ul class="nav nav-tabs center" role="tablist">
+    <li class="dropdown">
+        <button class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Counties<span class="caret"></span></button>
+        <ul class="dropdown-menu">
+            <li><a href="./New London.html">New London</a></li>
+            <li><a href="./New Haven.html" >New Haven </a></li>
+            <li><a href="./Fairfield.html" >Fairfield </a></li>
+            <li><a href="./Hartford.html"  >Hartford  </a></li>
+            <li><a href="./Tolland.html"   >Tolland   </a></li>
+            <li><a href="./Litchfield.html">Litchfield</a></li>
+            <li><a href="./Middlesex.html" >Middlesex </a></li>
+            <li><a href="./Windham.html"   >Windham   </a></li>
+        </ul>
+    </li>
+</ul>
+
+
+Row {data-height=700px .tabset .tabset-fade}
+----------------------------------------------------------------------
+
+### County Cases over Time
+
+```{r, echo=FALSE, message=FALSE}
+# Generates a graph of total cases over time for each county 
+# plot cases over time
+ggplot(covid, aes(dateupdated, totalcases, color = county)) +
+  geom_line() + theme_classic() + xlab('') + ylab('Cases')
+```
+  
+### County Deaths Over Time
+
+```{r, echo=FALSE, message=FALSE}
+# Generates a graph of total cases over time for each county 
+# plot cases over time
+ggplot(covid, aes(dateupdated, totaldeaths, color = county)) +
+  geom_line() + theme_classic() + xlab('') + ylab('Deaths')
+
+```
+
+### County Hospitalizations Over Time
+
+```{r, echo=FALSE, message=FALSE}
+# Generates a graph of total cases over time for each county 
+# plot cases over time
+ggplot(covid, aes(dateupdated, hospitalization, color = county)) +
+  geom_line() + theme_classic() + xlab('') + ylab('Hospitalizations')
+
+```
+
+### Total Cases per County
+```{r, echo=FALSE, message=FALSE}
+# Filters the data to look at only the most recent date
+# and generates a bar graph of total cases per county
+# covid_mr means covid most recent
+lastDate <- last(covid$dateupdated)
+covid_mr <- covid %>% filter(dateupdated == lastDate) 
+ggplot(data = covid_mr, aes(x=county, y = totalcases, fill = county)) +
+  geom_bar(stat = "identity") + labs(x = "", y = "Total Cases") + theme(legend.position = "none") 
+# Remove labels from x axis
+# + theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank())
+```
+
+### Total Deaths per County
+
+```{r, echo=FALSE, message=FALSE}
+# Filters the data to look at only the most recent date
+# and generates a bar graph of total cases per county
+# covid_mr means covid most recent
+lastDate <- last(covid$dateupdated)
+covid_mr <- covid %>% filter(dateupdated == lastDate) 
+ggplot(data = covid_mr, aes(x=county, y = totaldeaths, fill = county)) +
+  geom_bar(stat = "identity") + labs(x = "", y = "Total Deaths") + theme(legend.position = "none")
+# + theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank())
+```

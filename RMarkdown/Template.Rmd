@@ -20,72 +20,6 @@ params:
 editor_options: 
   chunk_output_type: console
 ---
-<!-- highlight the tab of the county currently displaying -->
-<style>
-.current {
-    
-    background-color: maroon;
-}
-
-.blue {
-  
-    text-decoration: none;
-    color: #ffffff !important;
-    background-color: #2780e3;
-}
-</style>
-
-<script>
-// wait for the page to load to do this, can't select elements that aren't loaded yet.
-
-window.onload = function () {
-
-  // console.log("We are executing on load");
-  
-  var tabs = document.querySelectorAll(".navbar-left > li > a");
-  
-  for (i=0; i<tabs.length; i++)
-  {
-    var x = tabs[i];
-    //console.log(x.innerHTML);
-    if (x.innerHTML == "County Data")
-    {
-      x.classList.add("current"); // assign the current class to the current tab
-    }
-  }
-  
-  var ddlist = document.querySelectorAll(".dropdown-menu > li > a");
-  
-  for (i=0; i<ddlist.length; i++)
-  {
-    var x = ddlist[i];
-    //console.log(x.innerHTML);
-    if (x.innerHTML == "`r params$data`")
-    {
-      x.classList.add("blue"); // assign the current class to the current tab
-    }
-  }
-}
-</script>
-
-<div align="left">
-<ul class="nav nav-tabs" role="tablist">
-    <li class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">Please Select a County<span class="caret"></span></a>
-        <ul class="dropdown-menu">
-            <li><a href="./New London.html">New London</a></li>
-            <li><a href="./New Haven.html" >New Haven</a></li>
-            <li><a href="./Fairfield.html" >Fairfield</a></li>
-            <li><a href="./Hartford.html"  >Hartford</a></li>
-            <li><a href="./Tolland.html"   >Tolland</a></li>
-            <li><a href="./Litchfield.html">Litchfield</a></li>
-            <li><a href="./Middlesex.html" >Middlesex</a></li>
-            <li><a href="./Windham.html"   >Windham</a></li>
-        </ul>
-    </li>
-</ul>
-</div>
-
 ```{r setup, include=FALSE}
 
 # include libraries
@@ -134,11 +68,80 @@ highest_30day_deaths <- max(daily_deaths[(length(daily_deaths)-30):length(daily_
 
 ```
 
-<div align="center">
-#### `r if(params$devp == 'y'){"*This site is under development and is deployed using GitHub pages for testing purposes.*"}`
-</div>
+```{css, echo=FALSE}
+.current {
+  background-color: maroon;
+}
 
-<div align="center">
+.blue {
+  text-decoration: none;
+  color: #ffffff !important;
+  background-color: #2780e3;
+}
+
+button.dropdown-toggle {
+  color: #ffffff;
+  background-color: #2780e3;
+  font-size: large;
+}
+
+.center {
+  margin: auto;
+  /*border: 3px solid #73AD21;*/
+  /*padding: 3px;*/
+  text-align: center;
+```
+
+<script>
+// wait for the page to load to do this, can't select elements that aren't loaded yet.
+
+window.onload = function () {
+
+  // console.log("We are executing on load");
+  
+  var list = document.querySelectorAll(".navbar-left > li > a");
+  
+  for (i=0; i<list.length; i++)
+  {
+    var x = list[i];
+    //console.log(x.innerHTML);
+    if (x.innerHTML == "County Data")
+    {
+      x.classList.add("current"); // assign the current class to the current tab
+    }
+  }
+  
+  var ddlist = document.querySelectorAll(".dropdown-menu > li > a");
+  
+  for (i=0; i<ddlist.length; i++)
+  {
+    var x = ddlist[i];
+    //console.log(x.innerHTML);
+    if (x.innerHTML == "`r params$data`")
+    {
+      x.classList.add("blue"); // assign the current class to the current tab
+    }
+  }
+}
+</script>
+
+<ul class="nav" role="tablist">
+    <li class="dropdown">
+        <button class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Counties<span class="caret"></span></button>
+        <ul class="dropdown-menu">
+            <li><a href="./New London.html">New London</a></li>
+            <li><a href="./New Haven.html" >New Haven</a></li>
+            <li><a href="./Fairfield.html" >Fairfield</a></li>
+            <li><a href="./Hartford.html"  >Hartford</a></li>
+            <li><a href="./Tolland.html"   >Tolland</a></li>
+            <li><a href="./Litchfield.html">Litchfield</a></li>
+            <li><a href="./Middlesex.html" >Middlesex</a></li>
+            <li><a href="./Windham.html"   >Windham</a></li>
+        </ul>
+    </li>
+</ul>
+
+<div class="center">
 ### *This page contains COVID-19 information for **`r params$data`, CT** from `r beginDate ` to `r lastDate`.*
 </div>
 
@@ -171,7 +174,7 @@ if (hospitalizations > 20) {
 valueBox(hospitalizations, icon = "fa-first-aid", color = boxcolor)
 ```
 
-Row
+Row{data-height=600px}
 -----------------------------------------------------------------------
 
 ### Cases per Day
@@ -213,29 +216,28 @@ geom_bar(stat="identity", fill="orange") + theme(legend.position = "none") + lab
 bar_hospitilization
 ```
 
-Row
+Row {data-height=150px}
 -----------------------------------------------------------------------
+### Latest Daily Cases (30 day high = `r highest_30day_cases`)
 
-### Previous Daily Cases (30 day high = `r highest_30day_cases`) 
 ```{r, echo=FALSE, message=FALSE}
-previous_daily_case <- daily_cases[length(daily_cases)-1]
+previous_daily_case <- daily_cases[length(daily_cases)]
 gauge(previous_daily_case, min = 0, max = highest_30day_cases, symbol = '', gaugeSectors(
 success = c(0,highest_30day_cases), colors=c("primary")
 ))
 ```
 
-### Previous Daily Deaths (30 day high = `r highest_30day_deaths`) 
+### Latest Daily Deaths (30 day high = `r highest_30day_deaths`) 
 
 ```{r, echo=FALSE, message=FALSE}
-previous_daily_deaths <- daily_deaths[length(daily_deaths)-1]
+previous_daily_deaths <- daily_deaths[length(daily_deaths)]
 gauge(previous_daily_deaths, min = 0, max = highest_30day_deaths, symbol = '', gaugeSectors(
-success = c(0,highest_30day_deaths),colors = c("black")
+success = c(0, highest_30day_deaths),colors = c("black")
 ))
 ```
 
-Row {data-height=10px}
------------------------------------------------------------------------
-
+<!-- Maybe we can embed this with r code 
 <div align="right">
 **Created by B. Gonzalez and S. Yraita in support of EIDA's [CT COVID Data Analysis](https://eida.easternct.edu/shiny/app/covid-ct) project.**
 </div>
+-->
