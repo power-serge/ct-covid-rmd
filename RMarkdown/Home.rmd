@@ -2,20 +2,23 @@
 title: "COVID-19 Data"
 output:
   flexdashboard::flex_dashboard:
+    includes:
+      after_body: footer.html
     favicon: https://hubcdn.arcgis.com/opendata-ui/assets/assets/images/favicon-45a5f6cdc7f23c52b20204d54a7d9ca2.ico
     navbar:
-    - { title: "Home",          href: "", align: left }
-    - { title: "Projections",   href: "", align: left }
-    - { title: "Statewide Data",href: "", align: left }
-    - { title: "County Data",   href: "./county.html", align: left }
-    - { title: "Age Data",      href: "", align: left }
-    - { title: "Gender Data",   href: "", align: left }
-    - { title: "Email Sign-up", href: "", align: left }
-    - { title: "About",         href: "", align: left }
+    - { title: "Home",       href: "./Home.html",       align: right }
+    - { title: "New London", href: "./New London.html", align: right }
+    - { title: "New Haven",  href: "./New Haven.html",  align: right }
+    - { title: "Fairfield",  href: "./Fairfield.html",  align: right }
+    - { title: "Hartford",   href: "./Hartford.html",   align: right }
+    - { title: "Tolland",    href: "./Tolland.html",    align: right }
+    - { title: "Litchfield", href: "./Litchfield.html", align: right }
+    - { title: "Middlesex",  href: "./Middlesex.html",  align: right }
+    - { title: "Windham",    href: "./Windham.html",    align: right }
     orientation: rows
-    vertical_layout: scroll
+    #vertical_layout: scroll
 params:
-    data: "New London"
+    data: "Hartford"
     devp: "n"
 editor_options: 
   chunk_output_type: console
@@ -27,6 +30,10 @@ library(flexdashboard)
 library(readr)
 library(dplyr)
 library(ggplot2)
+library(plotly)
+library(ggthemes)
+library(cowplot)
+library(hrbrthemes)
 library(knitr)
 library(zoo) # moving averages
 
@@ -41,28 +48,45 @@ covid_county <- covid %>% filter(county == params$data)
 # get date range
 beginDate <- format.Date(first(covid$dateupdated), '%m/%d/%Y')
 lastDate <- format.Date(last(covid$dateupdated), '%m/%d/%Y')
+
+# Filters the data to look at only the most recent date 
+# covid_mr means covid most recent
+lastDate <- last(covid$dateupdated)
+covid_mr <- covid %>% filter(dateupdated == lastDate) 
 ```
 
 <!--CUSTOM STYLES-->
-<style>
-/* highlight the tab of the county currently displaying */
+```{css, echo=FALSE}
 .current {
   background-color: maroon;
 }
 
-button.dropdown-toggle {
-  color: #ffffff;
-  background-color: #2780e3;
-  font-size: x-large;
+body {
+    /*background-color: lightblue;*/
+    padding-top: 40px;
 }
 
-.center {
-  margin: auto;
-  /*width: 30%;*/
-  /*border: 3px solid #73AD21;*/
-  padding: 10px;
+@media only screen and (max-width: 963px) {
+  body {
+    /*background-color: lightblue;*/
+    padding-top: 100px;
+  }
 }
-</style>
+
+@media only screen and (max-width: 823px) {
+  body {
+    /*background-color: lightblue;*/
+    padding-top: 140px;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  body {
+    /*background-color: lightblue;*/
+    padding-top: 50px;
+  }
+}
+```
 
 <!--CUSTOM JS-->
 <script>
@@ -72,13 +96,13 @@ window.onload = function () {
 
   // console.log("We are executing on load");
   
-  var list = document.querySelectorAll(".navbar-left > li > a");
+  var list = document.querySelectorAll(".navbar-right > li > a");
   
   for (i=0; i<list.length; i++)
   {
     var x = list[i];
     //console.log(x.innerHTML);
-    if (x.innerHTML == "County Data")
+    if (x.innerHTML == "Home")
     {
       x.classList.add("current"); // assign the current class to the current tab
     }
@@ -95,23 +119,6 @@ window.onload = function () {
 ### *This page contains COVID-19 information for the 8 Counties in CT from `r beginDate ` to `r lastDate`.*
 </div>
 
-<ul class="nav nav-tabs center" role="tablist">
-    <li class="dropdown">
-        <button class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Counties<span class="caret"></span></button>
-        <ul class="dropdown-menu">
-            <li><a href="./New London.html">New London</a></li>
-            <li><a href="./New Haven.html" >New Haven </a></li>
-            <li><a href="./Fairfield.html" >Fairfield </a></li>
-            <li><a href="./Hartford.html"  >Hartford  </a></li>
-            <li><a href="./Tolland.html"   >Tolland   </a></li>
-            <li><a href="./Litchfield.html">Litchfield</a></li>
-            <li><a href="./Middlesex.html" >Middlesex </a></li>
-            <li><a href="./Windham.html"   >Windham   </a></li>
-        </ul>
-    </li>
-</ul>
-
-
 Row {data-height=700px .tabset .tabset-fade}
 ----------------------------------------------------------------------
 
@@ -120,8 +127,10 @@ Row {data-height=700px .tabset .tabset-fade}
 ```{r, echo=FALSE, message=FALSE}
 # Generates a graph of total cases over time for each county 
 # plot cases over time
-ggplot(covid, aes(dateupdated, totalcases, color = county)) +
+ggplotly(
+  ggplot(covid, aes(dateupdated, totalcases, color = county)) +
   geom_line() + theme_classic() + xlab('') + ylab('Cases')
+)
 ```
   
 ### County Deaths Over Time
@@ -129,9 +138,10 @@ ggplot(covid, aes(dateupdated, totalcases, color = county)) +
 ```{r, echo=FALSE, message=FALSE}
 # Generates a graph of total cases over time for each county 
 # plot cases over time
+ggplotly(
 ggplot(covid, aes(dateupdated, totaldeaths, color = county)) +
   geom_line() + theme_classic() + xlab('') + ylab('Deaths')
-
+)
 ```
 
 ### County Hospitalizations Over Time
@@ -139,20 +149,19 @@ ggplot(covid, aes(dateupdated, totaldeaths, color = county)) +
 ```{r, echo=FALSE, message=FALSE}
 # Generates a graph of total cases over time for each county 
 # plot cases over time
-ggplot(covid, aes(dateupdated, hospitalization, color = county)) +
+ggplotly(
+  ggplot(covid, aes(dateupdated, hospitalization, color = county)) +
   geom_line() + theme_classic() + xlab('') + ylab('Hospitalizations')
-
+)
 ```
 
 ### Total Cases per County
 ```{r, echo=FALSE, message=FALSE}
-# Filters the data to look at only the most recent date
-# and generates a bar graph of total cases per county
-# covid_mr means covid most recent
-lastDate <- last(covid$dateupdated)
-covid_mr <- covid %>% filter(dateupdated == lastDate) 
-ggplot(data = covid_mr, aes(x=county, y = totalcases, fill = county)) +
-  geom_bar(stat = "identity") + labs(x = "", y = "Total Cases") + theme(legend.position = "none") 
+ggplotly(
+  ggplot(data = covid_mr, aes(x=county, y = totalcases, fill = county)) +
+  geom_bar(stat = "identity") + labs(x = "", y = "Total Cases") + theme_classic() +
+  theme(legend.position = "none") + theme(axis.text.x=element_text(angle = 45, hjust = 0.9, size = 11))
+)  
 # Remove labels from x axis
 # + theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank())
 ```
@@ -160,12 +169,10 @@ ggplot(data = covid_mr, aes(x=county, y = totalcases, fill = county)) +
 ### Total Deaths per County
 
 ```{r, echo=FALSE, message=FALSE}
-# Filters the data to look at only the most recent date
-# and generates a bar graph of total cases per county
-# covid_mr means covid most recent
-lastDate <- last(covid$dateupdated)
-covid_mr <- covid %>% filter(dateupdated == lastDate) 
-ggplot(data = covid_mr, aes(x=county, y = totaldeaths, fill = county)) +
-  geom_bar(stat = "identity") + labs(x = "", y = "Total Deaths") + theme(legend.position = "none")
-# + theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank())
+ggplotly(
+  ggplot(data = covid_mr, aes(x=county, y = totaldeaths, fill = county)) +
+  geom_bar(stat = "identity") + labs(x = "", y = "Total Deaths") + theme_classic() +
+  theme(legend.position = "none") + theme(axis.text.x=element_text(angle = 45, hjust = 0.9, size = 11))
+)
+# +  theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank())
 ```

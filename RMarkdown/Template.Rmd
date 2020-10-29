@@ -2,90 +2,27 @@
 title: "`r params$data` - CT COVID 19 Data"
 output:
   flexdashboard::flex_dashboard:
+    includes:
+      after_body: footer.html
     favicon: https://hubcdn.arcgis.com/opendata-ui/assets/assets/images/favicon-45a5f6cdc7f23c52b20204d54a7d9ca2.ico
     navbar:
-    - { title: "Home",          href: "", align: left }
-    - { title: "Projections",   href: "", align: left }
-    - { title: "Statewide Data",href: "", align: left }
-    - { title: "County Data",   href: "./county.html", align: left }
-    - { title: "Age Data",      href: "", align: left }
-    - { title: "Gender Data",   href: "", align: left }
-    - { title: "Email Sign-up", href: "", align: left }
-    - { title: "About",         href: "", align: left }
+    - { title: "Home",       href: "./Home.html",       align: right }
+    - { title: "New London", href: "./New London.html", align: right }
+    - { title: "New Haven",  href: "./New Haven.html",  align: right }
+    - { title: "Fairfield",  href: "./Fairfield.html",  align: right }
+    - { title: "Hartford",   href: "./Hartford.html",   align: right }
+    - { title: "Tolland",    href: "./Tolland.html",    align: right }
+    - { title: "Litchfield", href: "./Litchfield.html", align: right }
+    - { title: "Middlesex",  href: "./Middlesex.html",  align: right }
+    - { title: "Windham",    href: "./Windham.html",    align: right }
     orientation: rows
-    vertical_layout: scroll
+    #vertical_layout: scroll
 params:
     data: "Hartford"
     devp: "n"
 editor_options: 
   chunk_output_type: console
 ---
-<!-- highlight the tab of the county currently displaying -->
-<style>
-.current {
-    
-    background-color: maroon;
-}
-
-.blue {
-  
-    text-decoration: none;
-    color: #ffffff !important;
-    background-color: #2780e3;
-}
-</style>
-
-<script>
-// wait for the page to load to do this, can't select elements that aren't loaded yet.
-
-window.onload = function () {
-
-  // console.log("We are executing on load");
-  
-  var tabs = document.querySelectorAll(".navbar-left > li > a");
-  
-  for (i=0; i<tabs.length; i++)
-  {
-    var x = tabs[i];
-    //console.log(x.innerHTML);
-    if (x.innerHTML == "County Data")
-    {
-      x.classList.add("current"); // assign the current class to the current tab
-    }
-  }
-  
-  var ddlist = document.querySelectorAll(".dropdown-menu > li > a");
-  
-  for (i=0; i<ddlist.length; i++)
-  {
-    var x = ddlist[i];
-    //console.log(x.innerHTML);
-    if (x.innerHTML == "`r params$data`")
-    {
-      x.classList.add("blue"); // assign the current class to the current tab
-    }
-  }
-}
-</script>
-
-<div align="left">
-<ul class="nav nav-tabs" role="tablist">
-    <li class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">Please Select a County<span class="caret"></span></a>
-        <ul class="dropdown-menu">
-            <li><a href="./New London.html">New London</a></li>
-            <li><a href="./New Haven.html" >New Haven</a></li>
-            <li><a href="./Fairfield.html" >Fairfield</a></li>
-            <li><a href="./Hartford.html"  >Hartford</a></li>
-            <li><a href="./Tolland.html"   >Tolland</a></li>
-            <li><a href="./Litchfield.html">Litchfield</a></li>
-            <li><a href="./Middlesex.html" >Middlesex</a></li>
-            <li><a href="./Windham.html"   >Windham</a></li>
-        </ul>
-    </li>
-</ul>
-</div>
-
 ```{r setup, include=FALSE}
 
 # include libraries
@@ -93,6 +30,10 @@ library(flexdashboard)
 library(readr)
 library(dplyr)
 library(ggplot2)
+library(plotly)
+library(ggthemes)
+library(cowplot)
+library(hrbrthemes)
 library(knitr)
 library(zoo) # moving averages
 
@@ -131,15 +72,79 @@ highest_30day_cases <- max(daily_cases[(length(daily_cases)-30):length(daily_cas
 
 # 30 day highest deaths
 highest_30day_deaths <- max(daily_deaths[(length(daily_deaths)-30):length(daily_deaths)])
-
 ```
 
-<div align="center">
-#### `r if(params$devp == 'y'){"*This site is under development and is deployed using GitHub pages for testing purposes.*"}`
-</div>
+<!--CUSTOM CSS-->
+```{css, echo=FALSE}
+.current {
+  background-color: maroon;
+}
 
-<div align="center">
-### *This page contains COVID-19 information for **`r params$data`, CT** from `r beginDate ` to `r lastDate`.*
+.center {
+  /*display: inline-block;*/
+  /*border: 3px solid #73AD21;*/
+  margin: auto;
+  text-align: center;
+}
+
+body {
+    /*background-color: lightblue;*/
+    padding-top: 40px;
+}
+
+@media only screen and (max-width: 1080px) {
+  body {
+    /*background-color: lightblue;*/
+    padding-top: 100px;
+  }
+}
+
+@media only screen and (max-width: 838px) {
+  body {
+    /*background-color: lightblue;*/
+    padding-top: 140px;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  body {
+    /*background-color: lightblue;*/
+    padding-top: 50px;
+  }
+}
+```
+
+<!--CUSTOM JS
+The reason why we can't use embedded javascript is because the ` means a string 
+literal in JavaScript but it's also used for inline r code in the markdown doc.
+So when I try to pass the param as `r params$data` it interprets that literally. 
+There might be a way to escape the ` or a special way to inject inline r in the 
+js code but so far I haven't found one.
+-->
+<script>
+// wait for the page to load to do this, can't select elements that aren't loaded yet.
+
+window.onload = function () {
+
+  //console.log("We are executing on load");
+  
+  var list = document.querySelectorAll(".navbar-right > li > a");
+  
+  for (i=0; i<list.length; i++)
+  {
+    var x = list[i];
+    console.log(x.innerHTML);
+    
+    if (x.innerHTML == "`r params$data`")
+    {
+      x.classList.add("current"); // assign the current class to the current tab
+    }
+  }
+}
+</script>
+
+<div class="center">
+### *This page contains COVID-19 information for **`r params$data`, CT** from `r beginDate` to `r lastDate`.*
 </div>
 
 Row
@@ -171,7 +176,7 @@ if (hospitalizations > 20) {
 valueBox(hospitalizations, icon = "fa-first-aid", color = boxcolor)
 ```
 
-Row
+Row{data-height=600px}
 -----------------------------------------------------------------------
 
 ### Cases per Day
@@ -181,10 +186,12 @@ Row
 seven_case_avg <- rollmean(daily_cases, k = 7, fill = 0)
 df <- data.frame(daily_cases,covid_county$dateupdated)
 
-barcases <- ggplot(data = df, aes(x=covid_county.dateupdated ,y = TotalCases, )) +
-geom_bar(stat = "identity", fill="steelblue") + theme(legend.position = "none") + labs(x = " ", y = "Cases") + geom_line(aes(y = seven_case_avg), size = 1, color="red", group = 1)
+bar_cases <- ggplot(data = df, aes(x=covid_county.dateupdated ,y = TotalCases, )) +
+geom_bar(stat = "identity", fill="steelblue") + theme(legend.position = "none") + labs(x = " ", y = "Cases") + geom_line(aes(y = seven_case_avg), size = 1, color="red", group = 1) + theme_cowplot()
 
-barcases
+bar_cases <- ggplotly(bar_cases)
+
+bar_cases
 ```
 
 ### Deaths per Day
@@ -195,7 +202,9 @@ seven_death_avg <- rollmean(daily_deaths, k = 7, fill = 0)
 death_df <- data.frame(daily_deaths,covid_county$dateupdated)
 
 bar_deaths <- ggplot(data = death_df, aes(x=covid_county.dateupdated ,y = TotalDeaths)) +
-geom_bar(stat="identity", fill="black") + theme(legend.position = "none") + labs(x = " ", y = "Deaths") + geom_line(aes(y = seven_death_avg), size = 1, color="red", group = 1)
+geom_bar(stat="identity", fill="black") + theme(legend.position = "none") + labs(x = " ", y = "Deaths") + geom_line(aes(y = seven_death_avg), size = 1, color="red", group = 1) + theme_cowplot()
+
+bar_deaths <- ggplotly(bar_deaths)
 
 bar_deaths
 ```
@@ -208,34 +217,29 @@ bar_deaths
 seven_hosp_avg <- rollmean(covid_county$hospitalization,k=7,fill=NA)
 
 bar_hospitilization <- ggplot(data = covid_county, aes(x = dateupdated , y = hospitalization)) +
-geom_bar(stat="identity", fill="orange") + theme(legend.position = "none") + labs(x = " ", y = "Hospitalizations") + geom_line(aes(y = seven_hosp_avg), size = 1, color="red", group = 1)
+geom_bar(stat="identity", fill="orange") + theme(legend.position = "none") + labs(x = " ", y = "Hospitalizations") + geom_line(aes(y = seven_hosp_avg), size = 1, color="red", group = 1) + theme_cowplot()
+
+bar_hospitilization <- ggplotly(bar_hospitilization)
 
 bar_hospitilization
 ```
 
-Row
+Row {data-height=150px}
 -----------------------------------------------------------------------
+### Latest Daily Cases (30 day high = `r highest_30day_cases`)
 
-### Previous Daily Cases (30 day high = `r highest_30day_cases`) 
 ```{r, echo=FALSE, message=FALSE}
-previous_daily_case <- daily_cases[length(daily_cases)-1]
+previous_daily_case <- daily_cases[length(daily_cases)]
 gauge(previous_daily_case, min = 0, max = highest_30day_cases, symbol = '', gaugeSectors(
 success = c(0,highest_30day_cases), colors=c("primary")
 ))
 ```
 
-### Previous Daily Deaths (30 day high = `r highest_30day_deaths`) 
+### Latest Daily Deaths (30 day high = `r highest_30day_deaths`) 
 
 ```{r, echo=FALSE, message=FALSE}
-previous_daily_deaths <- daily_deaths[length(daily_deaths)-1]
+previous_daily_deaths <- daily_deaths[length(daily_deaths)]
 gauge(previous_daily_deaths, min = 0, max = highest_30day_deaths, symbol = '', gaugeSectors(
-success = c(0,highest_30day_deaths),colors = c("black")
+success = c(0, highest_30day_deaths),colors = c("black")
 ))
 ```
-
-Row {data-height=10px}
------------------------------------------------------------------------
-
-<div align="right">
-**Created by B. Gonzalez and S. Yraita in support of EIDA's [CT COVID Data Analysis](https://eida.easternct.edu/shiny/app/covid-ct) project.**
-</div>
