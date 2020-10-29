@@ -16,7 +16,7 @@ output:
     - { title: "Middlesex",  href: "./Middlesex.html",  align: right }
     - { title: "Windham",    href: "./Windham.html",    align: right }
     orientation: rows
-    vertical_layout: scroll
+    #vertical_layout: scroll
 params:
     data: "Hartford"
     devp: "n"
@@ -72,9 +72,9 @@ highest_30day_cases <- max(daily_cases[(length(daily_cases)-30):length(daily_cas
 
 # 30 day highest deaths
 highest_30day_deaths <- max(daily_deaths[(length(daily_deaths)-30):length(daily_deaths)])
-
 ```
 
+<!--CUSTOM CSS-->
 ```{css, echo=FALSE}
 .current {
   background-color: maroon;
@@ -82,9 +82,8 @@ highest_30day_deaths <- max(daily_deaths[(length(daily_deaths)-30):length(daily_
 
 .center {
   /*display: inline-block;*/
-  margin: auto;
   /*border: 3px solid #73AD21;*/
-  /*padding: 3px;*/
+  margin: auto;
   text-align: center;
 }
 
@@ -113,8 +112,6 @@ body {
     padding-top: 50px;
   }
 }
-
-
 ```
 
 <!--CUSTOM JS
