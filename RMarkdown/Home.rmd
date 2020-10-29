@@ -30,6 +30,10 @@ library(flexdashboard)
 library(readr)
 library(dplyr)
 library(ggplot2)
+library(plotly)
+library(ggthemes)
+library(cowplot)
+library(hrbrthemes)
 library(knitr)
 library(zoo) # moving averages
 
@@ -44,6 +48,11 @@ covid_county <- covid %>% filter(county == params$data)
 # get date range
 beginDate <- format.Date(first(covid$dateupdated), '%m/%d/%Y')
 lastDate <- format.Date(last(covid$dateupdated), '%m/%d/%Y')
+
+# Filters the data to look at only the most recent date 
+# covid_mr means covid most recent
+lastDate <- last(covid$dateupdated)
+covid_mr <- covid %>% filter(dateupdated == lastDate) 
 ```
 
 <!--CUSTOM STYLES-->
@@ -118,8 +127,10 @@ Row {data-height=700px .tabset .tabset-fade}
 ```{r, echo=FALSE, message=FALSE}
 # Generates a graph of total cases over time for each county 
 # plot cases over time
-ggplot(covid, aes(dateupdated, totalcases, color = county)) +
+ggplotly(
+  ggplot(covid, aes(dateupdated, totalcases, color = county)) +
   geom_line() + theme_classic() + xlab('') + ylab('Cases')
+)
 ```
   
 ### County Deaths Over Time
@@ -127,9 +138,10 @@ ggplot(covid, aes(dateupdated, totalcases, color = county)) +
 ```{r, echo=FALSE, message=FALSE}
 # Generates a graph of total cases over time for each county 
 # plot cases over time
+ggplotly(
 ggplot(covid, aes(dateupdated, totaldeaths, color = county)) +
   geom_line() + theme_classic() + xlab('') + ylab('Deaths')
-
+)
 ```
 
 ### County Hospitalizations Over Time
@@ -137,22 +149,19 @@ ggplot(covid, aes(dateupdated, totaldeaths, color = county)) +
 ```{r, echo=FALSE, message=FALSE}
 # Generates a graph of total cases over time for each county 
 # plot cases over time
-ggplot(covid, aes(dateupdated, hospitalization, color = county)) +
+ggplotly(
+  ggplot(covid, aes(dateupdated, hospitalization, color = county)) +
   geom_line() + theme_classic() + xlab('') + ylab('Hospitalizations')
-
+)
 ```
 
 ### Total Cases per County
 ```{r, echo=FALSE, message=FALSE}
-# Filters the data to look at only the most recent date
-# and generates a bar graph of total cases per county
-# covid_mr means covid most recent
-lastDate <- last(covid$dateupdated)
-covid_mr <- covid %>% filter(dateupdated == lastDate) 
-ggplot(data = covid_mr, aes(x=county, y = totalcases, fill = county)) +
+ggplotly(
+  ggplot(data = covid_mr, aes(x=county, y = totalcases, fill = county)) +
   geom_bar(stat = "identity") + labs(x = "", y = "Total Cases") + theme_classic() +
-  theme(legend.position = "none") + theme(axis.text.x=element_text(angle = 45, hjust = 0.9, size = 10))
-  
+  theme(legend.position = "none") + theme(axis.text.x=element_text(angle = 45, hjust = 0.9, size = 11))
+)  
 # Remove labels from x axis
 # + theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank())
 ```
@@ -160,13 +169,10 @@ ggplot(data = covid_mr, aes(x=county, y = totalcases, fill = county)) +
 ### Total Deaths per County
 
 ```{r, echo=FALSE, message=FALSE}
-# Filters the data to look at only the most recent date
-# and generates a bar graph of total cases per county
-# covid_mr means covid most recent
-lastDate <- last(covid$dateupdated)
-covid_mr <- covid %>% filter(dateupdated == lastDate) 
-ggplot(data = covid_mr, aes(x=county, y = totaldeaths, fill = county)) +
-  geom_bar(stat = "identity") + labs(x = "", y = "Total Deaths") + theme_classic() + 
-#  theme(legend.position = "none")
-  theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank())
+ggplotly(
+  ggplot(data = covid_mr, aes(x=county, y = totaldeaths, fill = county)) +
+  geom_bar(stat = "identity") + labs(x = "", y = "Total Deaths") + theme_classic() +
+  theme(legend.position = "none") + theme(axis.text.x=element_text(angle = 45, hjust = 0.9, size = 11))
+)
+# +  theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank())
 ```
