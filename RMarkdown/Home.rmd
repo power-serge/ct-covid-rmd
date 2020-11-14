@@ -40,8 +40,8 @@ library(knitr)
 library(zoo) # moving averages
 
 # get the data - leave for quick testing one file
-load("../data/covid.RData")
-covid <- covid %>% arrange(dateupdated)
+#load("../data/covid.RData")
+#covid <- covid %>% arrange(dateupdated)
 
 # Filters the data for a specified county, which is specified as a parameter
 # in the R Markdown file, and graphs the number of cases for this county ovr time.
@@ -113,10 +113,6 @@ window.onload = function () {
 </script>
 
 <!--CUSTOM HTML-->
-<div align="center">
-#### `r if(params$devp == 'y'){"*This site is under development and is deployed using GitHub pages for testing purposes.*"}`
-</div>
-
 <div align="center">
 ### *This page contains COVID-19 information for the 8 Counties in CT from `r beginDate ` to `r lastDate`.*
 </div>
