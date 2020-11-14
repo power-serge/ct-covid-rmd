@@ -1,5 +1,5 @@
 ---
-title: "COVID-19 Data"
+title: "CT COVID-19 Data"
 output:
   flexdashboard::flex_dashboard:
     includes:
@@ -132,8 +132,8 @@ tcc <- ggplot(data = covid_mr, aes(x=county, y = totalcases, fill = county)) +
   theme(legend.position = "none") + theme(axis.text.x=element_text(angle = 45, hjust = 0.9, size = 11))
 
 ggplotly(tcc, dynamicTicks = TRUE) %>% 
-  config(displayModeBar = F) %>% 
-  layout(xaxis=list(fixedrange=TRUE, yaxis=list(fixedrange=TRUE)))
+  config(modeBarButtons = list(list("toImage")), displaylogo = FALSE) %>%
+  layout(xaxis=list(fixedrange=TRUE), yaxis=list(fixedrange=TRUE))
 ```
 
 ### **Total Deaths per County**
@@ -144,8 +144,8 @@ tdc <- ggplot(data = covid_mr, aes(x=county, y = totaldeaths, fill = county)) +
   theme(legend.position = "none") + theme(axis.text.x=element_text(angle = 45, hjust = 0.9, size = 11))
 
 ggplotly(tdc, dynamicTicks = TRUE) %>% 
-  config(displayModeBar = F) %>% 
-  layout(xaxis=list(fixedrange=TRUE, yaxis=list(fixedrange=TRUE)))
+  config(modeBarButtons = list(list("toImage")), displaylogo = FALSE) %>%
+  layout(xaxis=list(fixedrange=TRUE), yaxis=list(fixedrange=TRUE))
 ```
 
 Row {data-height=800px}
@@ -160,8 +160,8 @@ hot <- ggplot(covid, aes(dateupdated, hospitalization, color = county)) +
   geom_line() + theme_classic() + xlab('') + ylab('Hospitalizations')
 
 ggplotly(hot, dynamicTicks = TRUE) %>%
-  config(displayModeBar = F) %>%
-  layout(xaxis=list(autorange=TRUE, yaxis=list(autorange=TRUE)))
+  config(modeBarButtons = list(list("toImage")), displaylogo = FALSE) %>%
+  layout(xaxis=list(fixedrange=TRUE), yaxis=list(fixedrange=TRUE))
 ```
 
 Row {data-height=600px}
@@ -176,8 +176,8 @@ cot <- ggplot(covid, aes(dateupdated, totalcases, color = county)) +
   geom_line() + theme_classic() + xlab('') + ylab('Cases')
 
 ggplotly(cot, dynamicTicks = TRUE) %>% 
-  config(displayModeBar = F) %>%
-  layout(xaxis=list(autorange=TRUE, yaxis=list(autorange=TRUE)))
+  config(modeBarButtons = list(list("toImage")), displaylogo = FALSE) %>%
+  layout(xaxis=list(fixedrange=TRUE), yaxis=list(fixedrange=TRUE))
 ```
   
 ### **County Deaths Over Time**
@@ -189,6 +189,6 @@ dot <- ggplot(covid, aes(dateupdated, totaldeaths, color = county)) +
   geom_line() + theme_classic() + xlab('') + ylab('Deaths')
 
 ggplotly(dot, dynamicTicks = TRUE) %>% 
-  config(displayModeBar = F) %>% 
-  layout(xaxis=list(autorange=TRUE, yaxis=list(autorange=TRUE)))
+  config(modeBarButtons = list(list("toImage")), displaylogo = FALSE) %>%
+  layout(xaxis=list(fixedrange=TRUE), yaxis=list(fixedrange=TRUE))
 ```
