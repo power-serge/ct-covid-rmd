@@ -40,8 +40,7 @@ library(knitr)
 library(zoo) # moving averages
 
 # get the data - leave for quick testing one file
-#load("../data/covid.RData")
-#covid <- covid %>% arrange(dateupdated)
+load("../data/covid.RData")
 
 # Filters the data for a specified county, which is specified as a parameter
 # in the R Markdown file, and graphs the number of cases for this county ovr time.
@@ -152,7 +151,7 @@ Row {data-height=800px}
 ```{r, echo=FALSE, message=FALSE}
 # Generates a graph of total cases over time for each county 
 # plot cases over time
-hot <- ggplot(covid, aes(dateupdated, hospitalization, color = county)) +
+hot <- ggplot(covid, aes(dateupdated, HospitalizationPer100K, color = county)) +
   geom_line() + theme_classic() + xlab('') + ylab('Hospitalizations')
 
 ggplotly(hot, dynamicTicks = TRUE) %>%
@@ -168,7 +167,7 @@ Row {data-height=600px}
 ```{r, echo=FALSE, message=FALSE}
 # Generates a graph of total cases over time for each county 
 # plot cases over time
-cot <- ggplot(covid, aes(dateupdated, totalcases, color = county)) +
+cot <- ggplot(covid, aes(dateupdated, CasesPer100K , color = county)) +
   geom_line() + theme_classic() + xlab('') + ylab('Cases')
 
 ggplotly(cot, dynamicTicks = TRUE) %>% 
@@ -181,7 +180,7 @@ ggplotly(cot, dynamicTicks = TRUE) %>%
 ```{r, echo=FALSE, message=FALSE}
 # Generates a graph of total cases over time for each county 
 # plot cases over time
-dot <- ggplot(covid, aes(dateupdated, totaldeaths, color = county)) +
+dot <- ggplot(covid, aes(dateupdated, DeathsPer100K, color = county)) +
   geom_line() + theme_classic() + xlab('') + ylab('Deaths')
 
 ggplotly(dot, dynamicTicks = TRUE) %>% 

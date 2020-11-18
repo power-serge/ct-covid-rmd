@@ -9,6 +9,15 @@ datadir <- "../data"
 htmldir <- "../tmp"
 ext     <- ".html"
 
+# reference to the county pages template
+template  <- "../RMarkdown/Template.Rmd"
+
+# reference to the Home page template
+home  <- "../RMarkdown/Home.Rmd"
+
+# constant 100,000
+multiplier <- 100000
+
 # create the data directory if it doesn't exist
 if (!file.exists(datadir)){
   dir.create(datadir)
@@ -19,17 +28,55 @@ if (!file.exists(htmldir)){
   dir.create(htmldir)
 }
 
-# reference to the county pages template
-template  <- "../RMarkdown/Template.Rmd"
-
-# reference to the Home page template
-home  <- "../RMarkdown/Home.Rmd"
-
 # get the data
 covid <- read_csv("https://data.ct.gov/resource/bfnu-rgqt.csv")
+pops <- read_csv("C:/code_repos/ct-covid-rmd/data/populations.csv", skip=2)
 
 # make sure data is in the right order
 covid <- covid %>% arrange(dateupdated)
+
+# create a list so we can refer to population data by name
+counties <- pops$county
+populations <- pops$population
+popList <- setNames(as.list(populations), counties)
+
+# function to append column with normalized covid data based on county population
+appendPer100 <- function(df, values, newCol){
+  for (i in 1:nrow(df)) {
+    if(df$county[i] == "Fairfield"){
+      df$per100[i] <- (values[i]/popList$Fairfield)*multiplier  
+    }
+    else if(df$county[i] == "New Haven"){
+      df$per100[i] <- (values[i]/popList$`New Haven`)*multiplier  
+    }
+    else if(df$county[i] == "Hartford"){
+      df$per100[i] <- (values[i]/popList$Hartford)*multiplier  
+    }
+    else if(df$county[i] == "New London"){
+      df$per100[i] <- (values[i]/popList$`New London`)*multiplier  
+    }
+    else if(df$county[i] == "Litchfield"){
+      df$per100[i] <- (values[i]/popList$Litchfield)*multiplier  
+    }
+    else if(df$county[i] == "Tolland"){
+      df$per100[i] <- (values[i]/popList$Tolland)*multiplier  
+    }
+    else if(df$county[i] == "Middlesex"){
+      df$per100[i] <- (values[i]/popList$Middlesex)*multiplier  
+    }
+    else if(df$county[i] == "Windham"){
+      df$per100[i] <- (values[i]/popList$Windham)*multiplier  
+    }
+  }
+  df$per100 <- round(df$per100, 3)
+  colnames(df)[length(df)] <- newCol
+  return(df)
+}
+
+covid <- appendPer100(covid, covid$totalcases, newCol = "CasesPer100K" )
+covid <- appendPer100(covid, covid$totaldeaths, newCol = "DeathsPer100K" )
+covid <- appendPer100(covid, covid$hospitalization, newCol = "HospitalizationPer100K" )
+
 
 # save data in a file
 save(covid, file = paste(datadir, "/covid.RData", sep = ""))
@@ -38,7 +85,7 @@ save(covid, file = paste(datadir, "/covid.RData", sep = ""))
 homepage <- paste(htmldir, "/", "Home", ext, sep="")
 
 # build the Home page
-rmarkdown::render(home, output_file = homepage, params = list(devp = "n"))
+#rmarkdown::render(home, output_file = homepage, params = list(devp = "n"))
 
 # get distinct counties
 counties <- unique(covid$county)
@@ -52,5 +99,5 @@ for (i in counties) {
   #print(htmlfile)
   
   # render the document, to suppress under construction message use devp="n"
-  rmarkdown::render(template, output_file = htmlfile, params = list(data = i, devp = "n"))
+  #rmarkdown::render(template, output_file = htmlfile, params = list(data = i, devp = "n"))
 }
