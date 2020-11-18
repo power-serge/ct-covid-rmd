@@ -1,5 +1,5 @@
 ---
-title: "COVID-19 Data"
+title: "CT COVID-19 Data"
 output:
   flexdashboard::flex_dashboard:
     includes:
@@ -16,7 +16,9 @@ output:
     - { title: "Middlesex",  href: "./Middlesex.html",  align: right }
     - { title: "Windham",    href: "./Windham.html",    align: right }
     orientation: rows
-    #vertical_layout: scroll
+    vertical_layout: scroll
+    mathjax: NULL
+    self_contained: FALSE
 params:
     data: "Hartford"
     devp: "n"
@@ -39,7 +41,6 @@ library(zoo) # moving averages
 
 # get the data - leave for quick testing one file
 load("../data/covid.RData")
-covid <- covid %>% arrange(dateupdated)
 
 # Filters the data for a specified county, which is specified as a parameter
 # in the R Markdown file, and graphs the number of cases for this county ovr time.
@@ -51,8 +52,8 @@ lastDate <- format.Date(last(covid$dateupdated), '%m/%d/%Y')
 
 # Filters the data to look at only the most recent date 
 # covid_mr means covid most recent
-lastDate <- last(covid$dateupdated)
-covid_mr <- covid %>% filter(dateupdated == lastDate) 
+endDate <- last(covid$dateupdated)
+covid_mr <- covid %>% filter(dateupdated == endDate) 
 ```
 
 <!--CUSTOM STYLES-->
@@ -112,67 +113,77 @@ window.onload = function () {
 
 <!--CUSTOM HTML-->
 <div align="center">
-#### `r if(params$devp == 'y'){"*This site is under development and is deployed using GitHub pages for testing purposes.*"}`
-</div>
-
-<div align="center">
 ### *This page contains COVID-19 information for the 8 Counties in CT from `r beginDate ` to `r lastDate`.*
 </div>
 
-Row {data-height=700px .tabset .tabset-fade}
+Row {data-height=700px}
 ----------------------------------------------------------------------
 
-### County Cases over Time
+### **Total Cases per County**
 
 ```{r, echo=FALSE, message=FALSE}
-# Generates a graph of total cases over time for each county 
-# plot cases over time
-ggplotly(
-  ggplot(covid, aes(dateupdated, totalcases, color = county)) +
-  geom_line() + theme_classic() + xlab('') + ylab('Cases')
-)
-```
-  
-### County Deaths Over Time
-
-```{r, echo=FALSE, message=FALSE}
-# Generates a graph of total cases over time for each county 
-# plot cases over time
-ggplotly(
-ggplot(covid, aes(dateupdated, totaldeaths, color = county)) +
-  geom_line() + theme_classic() + xlab('') + ylab('Deaths')
-)
-```
-
-### County Hospitalizations Over Time
-
-```{r, echo=FALSE, message=FALSE}
-# Generates a graph of total cases over time for each county 
-# plot cases over time
-ggplotly(
-  ggplot(covid, aes(dateupdated, hospitalization, color = county)) +
-  geom_line() + theme_classic() + xlab('') + ylab('Hospitalizations')
-)
-```
-
-### Total Cases per County
-```{r, echo=FALSE, message=FALSE}
-ggplotly(
-  ggplot(data = covid_mr, aes(x=county, y = totalcases, fill = county)) +
+tcc <- ggplot(data = covid_mr, aes(x=county, y = totalcases, fill = county)) +
   geom_bar(stat = "identity") + labs(x = "", y = "Total Cases") + theme_classic() +
   theme(legend.position = "none") + theme(axis.text.x=element_text(angle = 45, hjust = 0.9, size = 11))
-)  
-# Remove labels from x axis
-# + theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank())
+
+ggplotly(tcc, dynamicTicks = TRUE) %>% 
+  config(modeBarButtons = list(list("toImage")), displaylogo = FALSE) %>%
+  layout(xaxis=list(fixedrange=TRUE), yaxis=list(fixedrange=TRUE))
 ```
 
-### Total Deaths per County
+### **Total Deaths per County**
 
 ```{r, echo=FALSE, message=FALSE}
-ggplotly(
-  ggplot(data = covid_mr, aes(x=county, y = totaldeaths, fill = county)) +
+tdc <- ggplot(data = covid_mr, aes(x=county, y = totaldeaths, fill = county)) +
   geom_bar(stat = "identity") + labs(x = "", y = "Total Deaths") + theme_classic() +
   theme(legend.position = "none") + theme(axis.text.x=element_text(angle = 45, hjust = 0.9, size = 11))
-)
-# +  theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank())
+
+ggplotly(tdc, dynamicTicks = TRUE) %>% 
+  config(modeBarButtons = list(list("toImage")), displaylogo = FALSE) %>%
+  layout(xaxis=list(fixedrange=TRUE), yaxis=list(fixedrange=TRUE))
+```
+
+Row {data-height=800px}
+----------------------------------------------------------------------
+
+### **County Hospitalizations Over Time**
+
+```{r, echo=FALSE, message=FALSE}
+# Generates a graph of total cases over time for each county 
+# plot cases over time
+hot <- ggplot(covid, aes(dateupdated, HospitalizationPer100K, color = county)) +
+  geom_line() + theme_classic() + xlab('') + ylab('Hospitalizations (Per 100K)')
+
+ggplotly(hot, dynamicTicks = TRUE) %>%
+  config(modeBarButtons = list(list("toImage")), displaylogo = FALSE) %>%
+  layout(xaxis=list(fixedrange=TRUE), yaxis=list(fixedrange=TRUE))
+```
+
+Row {data-height=600px}
+----------------------------------------------------------------------
+
+### **County Cases over Time**
+
+```{r, echo=FALSE, message=FALSE}
+# Generates a graph of total cases over time for each county 
+# plot cases over time
+cot <- ggplot(covid, aes(dateupdated, CasesPer100K , color = county)) +
+  geom_line() + theme_classic() + xlab('') + ylab('Total Cases (Per 100K)')
+
+ggplotly(cot, dynamicTicks = TRUE) %>% 
+  config(modeBarButtons = list(list("toImage")), displaylogo = FALSE) %>%
+  layout(xaxis=list(fixedrange=TRUE), yaxis=list(fixedrange=TRUE))
+```
+  
+### **County Deaths Over Time**
+
+```{r, echo=FALSE, message=FALSE}
+# Generates a graph of total cases over time for each county 
+# plot cases over time
+dot <- ggplot(covid, aes(dateupdated, DeathsPer100K, color = county)) +
+  geom_line() + theme_classic() + xlab('') + ylab('Total Deaths (Per 100K)')
+
+ggplotly(dot, dynamicTicks = TRUE) %>% 
+  config(modeBarButtons = list(list("toImage")), displaylogo = FALSE) %>%
+  layout(xaxis=list(fixedrange=TRUE), yaxis=list(fixedrange=TRUE))
 ```

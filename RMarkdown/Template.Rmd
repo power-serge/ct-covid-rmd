@@ -1,5 +1,5 @@
 ---
-title: "`r params$data` - CT COVID 19 Data"
+title: "`r params$data` - CT COVID-19 Data"
 output:
   flexdashboard::flex_dashboard:
     includes:
@@ -16,6 +16,8 @@ output:
     - { title: "Middlesex",  href: "./Middlesex.html",  align: right }
     - { title: "Windham",    href: "./Windham.html",    align: right }
     orientation: rows
+    mathjax: NULL
+    self_contained: FALSE
     #vertical_layout: scroll
 params:
     data: "Hartford"
@@ -38,8 +40,8 @@ library(knitr)
 library(zoo) # moving averages
 
 # get the data - leave for quick testing one file
-load("../data/covid.RData")
-covid <- covid %>% arrange(dateupdated)
+#load("../data/covid.RData")
+#covid <- covid %>% arrange(dateupdated)
 
 # Filters the data for a specified county, which is specified as a parameter
 # in the R Markdown file, and graphs the number of cases for this county ovr time.
@@ -183,13 +185,17 @@ Row{data-height=600px}
 
 ```{r, echo=FALSE, message=FALSE}
 # 7 day average for cases
-seven_case_avg <- rollmean(daily_cases, k = 7, fill = 0)
+seven_case_avg <- rollmean(daily_cases, k = 7, fill = NA)
 df <- data.frame(daily_cases,covid_county$dateupdated)
 
-bar_cases <- ggplot(data = df, aes(x=covid_county.dateupdated ,y = TotalCases, )) +
-geom_bar(stat = "identity", fill="steelblue") + theme(legend.position = "none") + labs(x = " ", y = "Cases") + geom_line(aes(y = seven_case_avg), size = 1, color="red", group = 1) + theme_cowplot()
+bar_cases <- ggplot(data = df, aes(x=covid_county.dateupdated ,y = TotalCases, )) + 
+  geom_bar(stat = "identity", fill="steelblue") + theme(legend.position = "none") + labs(x = " ", y = "Cases") +
+  geom_line(aes(y = seven_case_avg), size = 1, color="red", group = 1) + theme_cowplot()
 
-bar_cases <- ggplotly(bar_cases)
+bar_cases <- ggplotly(bar_cases) %>% 
+  config(modeBarButtons = list(list("toImage")), displaylogo = FALSE) %>% 
+  layout(xaxis=list(fixedrange=TRUE), yaxis=list(fixedrange=TRUE)) %>%
+  partial_bundle()  
 
 bar_cases
 ```
@@ -198,13 +204,17 @@ bar_cases
 
 ```{r, echo=FALSE, message=FALSE}
 # 7 day average for deaths
-seven_death_avg <- rollmean(daily_deaths, k = 7, fill = 0)
+seven_death_avg <- rollmean(daily_deaths, k = 7, fill = NA)
 death_df <- data.frame(daily_deaths,covid_county$dateupdated)
 
-bar_deaths <- ggplot(data = death_df, aes(x=covid_county.dateupdated ,y = TotalDeaths)) +
-geom_bar(stat="identity", fill="black") + theme(legend.position = "none") + labs(x = " ", y = "Deaths") + geom_line(aes(y = seven_death_avg), size = 1, color="red", group = 1) + theme_cowplot()
+bar_deaths <- ggplot(data = death_df, aes(x=covid_county.dateupdated ,y = TotalDeaths)) + 
+  geom_bar(stat="identity", fill="black") + theme(legend.position = "none") + labs(x = " ", y = "Deaths") +
+  geom_line(aes(y = seven_death_avg), size = 1, color="red", group = 1) + theme_cowplot()
 
-bar_deaths <- ggplotly(bar_deaths)
+bar_deaths <- ggplotly(bar_deaths) %>% 
+  config(modeBarButtons = list(list("toImage")), displaylogo = FALSE) %>%
+  layout(xaxis=list(fixedrange=TRUE), yaxis=list(fixedrange=TRUE)) %>%
+  partial_bundle()
 
 bar_deaths
 ```
@@ -219,7 +229,10 @@ seven_hosp_avg <- rollmean(covid_county$hospitalization,k=7,fill=NA)
 bar_hospitilization <- ggplot(data = covid_county, aes(x = dateupdated , y = hospitalization)) +
 geom_bar(stat="identity", fill="orange") + theme(legend.position = "none") + labs(x = " ", y = "Hospitalizations") + geom_line(aes(y = seven_hosp_avg), size = 1, color="red", group = 1) + theme_cowplot()
 
-bar_hospitilization <- ggplotly(bar_hospitilization)
+bar_hospitilization <- ggplotly(bar_hospitilization) %>% 
+  config(modeBarButtons = list(list("toImage")), displaylogo = FALSE) %>% 
+  layout(xaxis=list(fixedrange=TRUE), yaxis=list(fixedrange=TRUE)) %>%
+  partial_bundle()
 
 bar_hospitilization
 ```
