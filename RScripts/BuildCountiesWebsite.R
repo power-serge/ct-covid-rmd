@@ -85,7 +85,7 @@ save(covid, file = paste(datadir, "/covid.RData", sep = ""))
 homepage <- paste(htmldir, "/", "Home", ext, sep="")
 
 # build the Home page
-#rmarkdown::render(home, output_file = homepage, params = list(devp = "n"))
+rmarkdown::render(home, output_file = homepage, params = list(devp = "n"))
 
 # get distinct counties
 counties <- unique(covid$county)
@@ -99,5 +99,5 @@ for (i in counties) {
   #print(htmlfile)
   
   # render the document, to suppress under construction message use devp="n"
-  #rmarkdown::render(template, output_file = htmlfile, params = list(data = i, devp = "n"))
+  rmarkdown::render(template, output_file = htmlfile, params = list(data = i, devp = "n"))
 }

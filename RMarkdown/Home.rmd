@@ -152,7 +152,7 @@ Row {data-height=800px}
 # Generates a graph of total cases over time for each county 
 # plot cases over time
 hot <- ggplot(covid, aes(dateupdated, HospitalizationPer100K, color = county)) +
-  geom_line() + theme_classic() + xlab('') + ylab('Hospitalizations')
+  geom_line() + theme_classic() + xlab('') + ylab('Hospitalizations (Per 100K)')
 
 ggplotly(hot, dynamicTicks = TRUE) %>%
   config(modeBarButtons = list(list("toImage")), displaylogo = FALSE) %>%
@@ -168,7 +168,7 @@ Row {data-height=600px}
 # Generates a graph of total cases over time for each county 
 # plot cases over time
 cot <- ggplot(covid, aes(dateupdated, CasesPer100K , color = county)) +
-  geom_line() + theme_classic() + xlab('') + ylab('Cases')
+  geom_line() + theme_classic() + xlab('') + ylab('Total Cases (Per 100K)')
 
 ggplotly(cot, dynamicTicks = TRUE) %>% 
   config(modeBarButtons = list(list("toImage")), displaylogo = FALSE) %>%
@@ -181,7 +181,7 @@ ggplotly(cot, dynamicTicks = TRUE) %>%
 # Generates a graph of total cases over time for each county 
 # plot cases over time
 dot <- ggplot(covid, aes(dateupdated, DeathsPer100K, color = county)) +
-  geom_line() + theme_classic() + xlab('') + ylab('Deaths')
+  geom_line() + theme_classic() + xlab('') + ylab('Total Deaths (Per 100K)')
 
 ggplotly(dot, dynamicTicks = TRUE) %>% 
   config(modeBarButtons = list(list("toImage")), displaylogo = FALSE) %>%
