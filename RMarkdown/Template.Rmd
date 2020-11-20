@@ -41,7 +41,6 @@ library(zoo) # moving averages
 
 # get the data - leave for quick testing one file
 #load("../data/covid.RData")
-#covid <- covid %>% arrange(dateupdated)
 
 # Filters the data for a specified county, which is specified as a parameter
 # in the R Markdown file, and graphs the number of cases for this county ovr time.
