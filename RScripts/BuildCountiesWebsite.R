@@ -43,30 +43,7 @@ popList <- setNames(as.list(populations), counties)
 # function to append column with normalized covid data based on county population
 appendPer100 <- function(df, values, newCol){
   for (i in 1:nrow(df)) {
-    if(df$county[i] == "Fairfield"){
-      df$per100[i] <- (values[i]/popList$Fairfield)*multiplier  
-    }
-    else if(df$county[i] == "New Haven"){
-      df$per100[i] <- (values[i]/popList$`New Haven`)*multiplier  
-    }
-    else if(df$county[i] == "Hartford"){
-      df$per100[i] <- (values[i]/popList$Hartford)*multiplier  
-    }
-    else if(df$county[i] == "New London"){
-      df$per100[i] <- (values[i]/popList$`New London`)*multiplier  
-    }
-    else if(df$county[i] == "Litchfield"){
-      df$per100[i] <- (values[i]/popList$Litchfield)*multiplier  
-    }
-    else if(df$county[i] == "Tolland"){
-      df$per100[i] <- (values[i]/popList$Tolland)*multiplier  
-    }
-    else if(df$county[i] == "Middlesex"){
-      df$per100[i] <- (values[i]/popList$Middlesex)*multiplier  
-    }
-    else if(df$county[i] == "Windham"){
-      df$per100[i] <- (values[i]/popList$Windham)*multiplier  
-    }
+    df$per100[i] <- (values[i]/popList[[df$county[i]]])*multiplier
   }
   df$per100 <- round(df$per100, 3)
   colnames(df)[length(df)] <- newCol
@@ -76,7 +53,6 @@ appendPer100 <- function(df, values, newCol){
 covid <- appendPer100(covid, covid$totalcases, newCol = "CasesPer100K" )
 covid <- appendPer100(covid, covid$totaldeaths, newCol = "DeathsPer100K" )
 covid <- appendPer100(covid, covid$hospitalization, newCol = "HospitalizationPer100K" )
-
 
 # save data in a file
 save(covid, file = paste(datadir, "/covid.RData", sep = ""))
