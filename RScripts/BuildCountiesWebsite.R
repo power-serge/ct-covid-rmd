@@ -36,9 +36,7 @@ pops <- read_csv("C:/code_repos/ct-covid-rmd/data/populations.csv", skip=2)
 covid <- covid %>% arrange(dateupdated)
 
 # create a list so we can refer to population data by name
-counties <- pops$county
-populations <- pops$population
-popList <- setNames(as.list(populations), counties)
+popList <- setNames(as.list(pops$population), pops$county)
 
 # function to append column with normalized covid data based on county population
 appendPer100 <- function(df, values, newCol){
@@ -61,7 +59,7 @@ save(covid, file = paste(datadir, "/covid.RData", sep = ""))
 homepage <- paste(htmldir, "/", "Home", ext, sep="")
 
 # build the Home page
-rmarkdown::render(home, output_file = homepage, params = list(devp = "n"))
+rmarkdown::render(home, output_file = homepage)
 
 # get distinct counties
 counties <- unique(covid$county)
@@ -74,6 +72,6 @@ for (i in counties) {
   
   #print(htmlfile)
   
-  # render the document, to suppress under construction message use devp="n"
-  rmarkdown::render(template, output_file = htmlfile, params = list(data = i, devp = "n"))
+  # render the document
+  rmarkdown::render(template, output_file = htmlfile, params = list(data = i))
 }

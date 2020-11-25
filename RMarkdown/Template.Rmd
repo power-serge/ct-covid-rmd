@@ -21,7 +21,6 @@ output:
     #vertical_layout: scroll
 params:
     data: "Hartford"
-    devp: "n"
 editor_options: 
   chunk_output_type: console
 ---
@@ -40,7 +39,7 @@ library(knitr)
 library(zoo) # moving averages
 
 # get the data - leave for quick testing one file
-#load("../data/covid.RData")
+load("../data/covid.RData")
 
 # Filters the data for a specified county, which is specified as a parameter
 # in the R Markdown file, and graphs the number of cases for this county ovr time.
@@ -53,13 +52,13 @@ lastDate <- format.Date(last(covid$dateupdated), '%m/%d/%Y')
 cases <- last(covid_county$totalcases)
 deaths <- last(covid_county$totaldeaths)
 
-# Daily Cases along with its bar graph
+# Daily Cases 
 cases1 <- covid_county$totalcases
 daily_cases <- diff(cases1)
 daily_cases <- replace(daily_cases, daily_cases < 0, 0)
 daily_cases <- cbind(TotalCases = c(0,daily_cases))
 
-# Daily deaths along with its bar graph
+# Daily deaths 
 deaths1 <- covid_county$totaldeaths
 daily_deaths <- diff(deaths1)
 daily_deaths <- replace(daily_deaths, daily_deaths < 0, 0)
