@@ -19,9 +19,6 @@ output:
     vertical_layout: scroll
     mathjax: NULL
     self_contained: FALSE
-params:
-    data: "Hartford"
-    devp: "n"
 editor_options: 
   chunk_output_type: console
 ---
@@ -41,10 +38,6 @@ library(zoo) # moving averages
 
 # get the data - leave for quick testing one file
 load("../data/covid.RData")
-
-# Filters the data for a specified county, which is specified as a parameter
-# in the R Markdown file, and graphs the number of cases for this county ovr time.
-covid_county <- covid %>% filter(county == params$data)
 
 # get date range
 beginDate <- format.Date(first(covid$dateupdated), '%m/%d/%Y')
@@ -122,8 +115,8 @@ Row {data-height=700px}
 ### **Total Cases per County**
 
 ```{r, echo=FALSE, message=FALSE}
-tcc <- ggplot(data = covid_mr, aes(x=county, y = totalcases, fill = county)) +
-  geom_bar(stat = "identity") + labs(x = "", y = "Total Cases") + theme_classic() +
+tcc <- ggplot(data = covid_mr, aes(x=county, y = CasesPer100K, fill = county)) +
+  geom_bar(stat = "identity") + labs(x = "", y = "Total Cases (Per 100K)") + theme_classic() +
   theme(legend.position = "none") + theme(axis.text.x=element_text(angle = 45, hjust = 0.9, size = 11))
 
 ggplotly(tcc, dynamicTicks = TRUE) %>% 
@@ -134,8 +127,8 @@ ggplotly(tcc, dynamicTicks = TRUE) %>%
 ### **Total Deaths per County**
 
 ```{r, echo=FALSE, message=FALSE}
-tdc <- ggplot(data = covid_mr, aes(x=county, y = totaldeaths, fill = county)) +
-  geom_bar(stat = "identity") + labs(x = "", y = "Total Deaths") + theme_classic() +
+tdc <- ggplot(data = covid_mr, aes(x=county, y = DeathsPer100K, fill = county)) +
+  geom_bar(stat = "identity") + labs(x = "", y = "Total Deaths (Per 100K)") + theme_classic() +
   theme(legend.position = "none") + theme(axis.text.x=element_text(angle = 45, hjust = 0.9, size = 11))
 
 ggplotly(tdc, dynamicTicks = TRUE) %>% 
@@ -159,7 +152,7 @@ ggplotly(hot, dynamicTicks = TRUE) %>%
   layout(xaxis=list(fixedrange=TRUE), yaxis=list(fixedrange=TRUE))
 ```
 
-Row {data-height=600px}
+Row {data-height=700px}
 ----------------------------------------------------------------------
 
 ### **County Cases over Time**
