@@ -30,7 +30,7 @@ if (!file.exists(htmldir)){
 
 # get the data
 covid <- read_csv("https://data.ct.gov/resource/bfnu-rgqt.csv")
-pops <- read_csv("C:/code_repos/ct-covid-rmd/data/populations.csv", skip=2)
+pops <- read_csv("../data/populations.csv", skip=2)
 
 # make sure data is in the right order
 covid <- covid %>% arrange(dateupdated)
