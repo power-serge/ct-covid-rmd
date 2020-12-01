@@ -37,6 +37,7 @@ library(ggthemes)
 library(cowplot)
 library(hrbrthemes)
 library(knitr)
+library(tidyr)
 library(zoo) # moving averages
 
 # get the data - leave for quick testing one file
@@ -192,13 +193,37 @@ colnames(ddf)[2]<- "dateupdated"
 d <- ddf %>%
   mutate(dateupdated = as.Date(dateupdated)) %>%
   complete(dateupdated = seq.Date(min(dateupdated), max(dateupdated), by="day")) 
+d[is.na(d)] <- 0 
+View()
+sevenday_vector <- as.matrix(d[,2])
+sevenday_vector[is.na(sevenday_vector)] <- 0
+# View(d)
+# write.table(sevenday_vector,row.names = FALSE,col.names = FALSE)
+# View(sevenday_vector)
+# nrow(sevenday_vector)
+weekly_mean <- function(df){
+  v1 <- c()
+  for(i in 7:nrow(df)){
+        v1[i-6] <- mean(df[(i-6):i])
+  }
+  return(v1) 
+}
 
-seven_case_avg <- rollmean(d$TotalCases, k = 7, fill = NA)
+d$TotalCases
+vec1 <- weekly_mean(sevenday_vector)
+vec1
+vec2 <- c()
+vec2[1:7] <- NA
+vec2[7:168] <- vec1
+vec2
+    
+length(d$dateupdated)
+length(d$TotalCases)
 
 #df <- data.frame(daily_cases,covid_county$dateupdated)
-bar_cases <- ggplot(data = covid_county, aes(x= dateupdated ,y = daily_cases, )) + 
+bar_cases <- ggplot(data = d, aes(x= dateupdated ,y = TotalCases, )) + 
   geom_bar(stat = "identity", fill="steelblue") + theme(legend.position = "none") + labs(x = " ", y = "Cases") +
-  geom_line(aes(y = seven_case_avg), size = 1, color="red", group = 1) + theme_cowplot()
+  geom_line(aes(y = vec2), size = 1, color="red", group = 1) + theme_cowplot()
 
 bar_cases <- ggplotly(bar_cases) %>% 
   config(modeBarButtons = list(list("toImage")), displaylogo = FALSE) %>% 
