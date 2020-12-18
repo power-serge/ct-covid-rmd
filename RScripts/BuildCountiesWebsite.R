@@ -77,16 +77,3 @@ for (i in counties) {
 }
 
 
-# commit and push if specified
-args <- commandArgs(trailing = TRUE)
-if ("push" %in% args) {
-
-    d=Sys.Date()
-
-    cmd = paste0('git commit -m "Daily update on ',d,'"')
-    system(cmd)
-    system('git push') 
-
-}
-
-
