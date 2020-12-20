@@ -275,7 +275,7 @@ highest_30day_deaths <- round(highest_30day_deaths, 1)
 
 Row {data-height=150px}
 -----------------------------------------------------------------------
-### Latest Daily Cases (30 day high of 7 day avg) = `r highest_30day_cases`)
+### Latest Daily Cases (30 day high of 7 day avg = `r highest_30day_cases`)
 
 ```{r, echo=FALSE, message=FALSE}
 
