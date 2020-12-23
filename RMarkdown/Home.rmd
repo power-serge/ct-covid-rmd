@@ -109,7 +109,7 @@ window.onload = function () {
 ### *This page contains COVID-19 information for the 8 Counties in CT from `r beginDate ` to `r lastDate`.*
 </div>
 
-Row {data-height=700px}
+Row {data-height=500px}
 ----------------------------------------------------------------------
 
 ### **Total Cases per County**
@@ -136,7 +136,7 @@ ggplotly(tdc, dynamicTicks = TRUE) %>%
   layout(xaxis=list(fixedrange=TRUE), yaxis=list(fixedrange=TRUE))
 ```
 
-Row {data-height=800px}
+Row {data-height=500px}
 ----------------------------------------------------------------------
 
 ### **County Hospitalizations Over Time**
@@ -152,7 +152,7 @@ ggplotly(hot, dynamicTicks = TRUE) %>%
   layout(xaxis=list(fixedrange=TRUE), yaxis=list(fixedrange=TRUE))
 ```
 
-Row {data-height=700px}
+Row {data-height=500px}
 ----------------------------------------------------------------------
 
 ### **County Cases over Time**
